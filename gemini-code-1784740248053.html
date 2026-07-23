@@ -1,0 +1,477 @@
+<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>全方位財務分配報表 - 明亮清爽版 v9</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script><script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script><script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script><script src="https://unpkg.com/@babel/standalone/babel.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>:root{--paper:#faf9f6;--card:#ffffff;--ink:#22252b;--ink-soft:#7a7f8a;--line:#edece6;
+--income:#dc9a26; --income-bg:#fdf4e0; --income-deep:#9c6c14;--expense:#2b9e86; --expense-bg:#e7f7f3; --expense-deep:#1f7566;--assets:#5271e0; --assets-bg:#eef1fd; --assets-deep:#37509e;--loan:#c15c50; --loan-bg:#fbece9; --loan-deep:#963f35;--danger:#e2665a; --danger-bg:#fdeceb;}body{font-family:'Noto Sans TC', sans-serif;background-color: var(--paper);-webkit-overflow-scrolling: touch;overscroll-behavior: contain;}.custom-scrollbar{-webkit-overflow-scrolling: touch;}html{ -webkit-text-size-adjust: 100%; }.font-display{ font-family:'Manrope','Noto Sans TC', sans-serif; }.font-num{ font-family:'Manrope','Noto Sans TC', sans-serif; font-feature-settings:"tnum"; }
+.glow-blob{ pointer-events:none; }
+@media print {@page { size: landscape; margin: 0; }body { background: white !important; margin: 0; padding: 0;}.print\:hidden { display: none !important; }.page-break { break-before: page; page-break-before: always; }}
+::-webkit-scrollbar { width: 6px; height: 6px; }::-webkit-scrollbar-track { background: transparent; }::-webkit-scrollbar-thumb { background: #d8d5cc; border-radius: 10px; }::-webkit-scrollbar-thumb:hover { background: #c2bfb3; }</style></head><body><div id="root"></div>
+<script type="text/babel">const { useState, useRef, useLayoutEffect, useEffect } = React;
+// 金額輸入框：輸入時自動加上千分位逗號，避免大數字（例如貸款）看錯位數
+const MoneyInput = ({ value, onChange, placeholder, className, style }) => {
+  const format = (v) => {
+    if (v === '' || v === null || v === undefined) return '';
+    const n = Number(v);
+    return isNaN(n) ? '' : n.toLocaleString('en-US');
+  };
+  const [display, setDisplay] = useState(format(value));
+  useEffect(() => { setDisplay(format(value)); }, [value]);
+  const handle = (e) => {
+    const raw = e.target.value.replace(/[^0-9]/g, '');
+    setDisplay(raw === '' ? '' : Number(raw).toLocaleString('en-US'));
+    onChange(raw);
+  };
+  return (<input type="text" inputMode="numeric" value={display} onChange={handle} placeholder={placeholder} className={className} style={style} />);
+};
+
+// ---------- 圖示（簡約線條風） ----------
+const IconCoin = ({color}) => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 15.2c.4.9 1.3 1.4 2.5 1.4 1.7 0 2.8-.9 2.8-2.1 0-3-5.4-1.4-5.4-4.3 0-1.2 1.1-2.1 2.7-2.1 1.1 0 2 .5 2.4 1.3M12 6.3v1.1M12 16.6v1.1"/></svg>);
+const IconWallet = ({color}) => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H18a1 1 0 0 1 1 1v2"/><path d="M3 7.5v10A2.5 2.5 0 0 0 5.5 20H19a1 1 0 0 0 1-1v-4.5"/><rect x="14" y="10.5" width="7" height="5" rx="1.2"/><circle cx="17" cy="13" r="0.6" fill={color}/></svg>);
+const IconChart = ({color}) => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19V5"/><path d="M4 19h16"/><rect x="7" y="12" width="3" height="7" rx="0.6"/><rect x="12.5" y="8" width="3" height="11" rx="0.6"/><rect x="18" y="14.5" width="3" height="4.5" rx="0.6"/></svg>);
+const IconShield = ({color}) => (<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3.5 5 6.5v5c0 5 3 8 7 9 4-1 7-4 7-9v-5l-7-3Z"/></svg>);
+const IconPiggy = ({color}) => (<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12.5c0-3.6 3.1-6 7.3-6 3 0 5.4 1.1 6.7 3H19a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-1v2.2c0 .8-.6 1.3-1.3 1.3H14l-.6 2h-3l-.4-2c-3.3-.5-6-2.4-6-4.5Z"/><circle cx="9.5" cy="12" r="0.6" fill={color}/></svg>);
+const IconHome = ({color}) => (<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v8.5a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V10"/></svg>);
+const IconTarget = ({color, size=20}) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.8"/><circle cx="12" cy="12" r="1.1" fill={color}/></svg>);
+const IconAlert = ({color, size=20}) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3.5 21.5 20h-19L12 3.5Z"/><path d="M12 10v4.2"/><circle cx="12" cy="17.3" r="0.15" fill={color} stroke="none"/><circle cx="12" cy="17.3" r="0.9" fill={color}/></svg>);
+const IconSearch = ({color, size=20}) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m19.5 19.5-4.3-4.3"/></svg>);
+const IconBulb = ({color, size=20}) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6.5 6.5 0 0 0-3.8 11.8c.6.45 1 1.1 1 1.9v.3h5.6v-.3c0-.8.4-1.45 1-1.9A6.5 6.5 0 0 0 12 3Z"/></svg>);
+
+// ---------- 美編元件 ----------
+const TONE_COLORS = {
+  income: { bg: '#fdf4e0', deep: '#9c6c14' },
+  expense: { bg: '#e7f7f3', deep: '#1f7566' },
+  assets: { bg: '#eef1fd', deep: '#37509e' },
+  loan: { bg: '#fbece9', deep: '#963f35' },
+};
+const CategoryChip = ({ icon, label, zh, tone }) => {
+  const c = TONE_COLORS[tone];
+  return (<div className="flex w-fit items-center gap-2.5 pl-3 pr-4 py-2 rounded-full" style={{background: c.bg}}>{icon}<span className="font-num text-[11px] font-bold tracking-[0.18em]" style={{color: c.deep}}>{label.toUpperCase()}</span><span className="text-[13px] font-bold" style={{color:'#22252b'}}>{zh}</span></div>);
+};
+
+const ValueBox = ({ value, size="text-4xl" }) => (<div className="flex items-baseline gap-1.5"><span className="text-lg font-num font-bold" style={{color:'#c7c4ba'}}>$</span><span className={`font-num font-extrabold tracking-tight ${size}`} style={{color:'var(--ink)'}}>{value.toLocaleString()}</span></div>);
+
+const SectionTitle = ({ children, amount, icon }) => (<div className="flex items-center justify-between pb-2.5 mt-6 mb-4" style={{borderBottom:'1.5px solid var(--line)'}}><h3 className="font-bold text-[14.5px] flex items-center gap-2" style={{color:'var(--ink)'}}>{icon}{children}</h3>{amount !== undefined && (<span className="font-num font-bold tracking-wide text-[14.5px]" style={{color:'var(--ink-soft)'}}>${amount.toLocaleString()}</span>)}</div>);
+
+const App = () => {
+  const reportRef = useRef(null);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  const [userName, setUserName] = useState('');
+  const [advisorName, setAdvisorName] = useState('');
+  const [incomes, setIncomes] = useState([{ id: 1, name: '', amount: 0, note: '' }]);
+  const [livingExps, setLivingExps] = useState([{ id: 1, name: '', amount: 0, note: '' }]);
+  const [savingExps, setSavingExps] = useState([{ id: 1, name: '', amount: 0, note: '' }]);
+  const [insuranceExps, setInsuranceExps] = useState([{ id: 1, name: '', amount: 0, note: '' }]);
+  const [assets, setAssets] = useState([{ id: 1, name: '', amount: 0, note: '' }]);
+  const [loans, setLoans] = useState([{ id: 1, name: '', amount: 0, note: '' },]);
+
+  // 第二頁：財務規劃紀錄
+  const [goals, setGoals] = useState('');
+  const [futureEvents, setFutureEvents] = useState('');
+  const [blindSpots, setBlindSpots] = useState('');
+  const [advice, setAdvice] = useState('');
+
+  const [branches, setBranches] = useState([{ id: 'b1', amount: 0, t1: '', t2: '', t3: '', subBranches: [] }]);
+
+  // ---- 樹狀圖連接線 ----
+  const treeWrapRef = useRef(null);
+  const branchCardRefs = useRef({});
+  const subWrapRefs = useRef({});
+  const subCardRefs = useRef({});
+  const [mainLine, setMainLine] = useState({ width: 0, points: [] });
+  const [subLines, setSubLines] = useState({});
+
+  const measureTree = () => {
+    if (!treeWrapRef.current) return;
+    const treeRect = treeWrapRef.current.getBoundingClientRect();
+    const points = branches.map(b => {
+      const el = branchCardRefs.current[b.id];
+      if (!el) return 0;
+      const r = el.getBoundingClientRect();
+      return (r.left + r.width / 2) - treeRect.left;
+    });
+    setMainLine({ width: treeRect.width, points });
+
+    const subMap = {};
+    branches.forEach(b => {
+      if (!b.subBranches.length) return;
+      const wrapEl = subWrapRefs.current[b.id];
+      const cardEl = branchCardRefs.current[b.id];
+      if (!wrapEl || !cardEl) return;
+      const wrapRect = wrapEl.getBoundingClientRect();
+      const cardRect = cardEl.getBoundingClientRect();
+      const origin = (cardRect.left + cardRect.width / 2) - wrapRect.left;
+      const pts = b.subBranches.map(s => {
+        const el = (subCardRefs.current[b.id] || {})[s.id];
+        if (!el) return 0;
+        const r = el.getBoundingClientRect();
+        return (r.left + r.width / 2) - wrapRect.left;
+      });
+      subMap[b.id] = { width: wrapRect.width, origin, points: pts };
+    });
+    setSubLines(subMap);
+  };
+
+  const measureTreeRef = useRef(measureTree);
+  measureTreeRef.current = measureTree;
+
+  useLayoutEffect(() => {
+    measureTree();
+  }, [branches]);
+
+  useEffect(() => {
+    const handler = () => measureTreeRef.current();
+    window.addEventListener('resize', handler);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => measureTreeRef.current());
+    }
+    const t = setTimeout(() => measureTreeRef.current(), 250);
+
+    let ro;
+    if (window.ResizeObserver) {
+      ro = new ResizeObserver(() => measureTreeRef.current());
+      if (treeWrapRef.current) ro.observe(treeWrapRef.current);
+      Object.values(branchCardRefs.current).forEach(el => el && ro.observe(el));
+      Object.values(subWrapRefs.current).forEach(el => el && ro.observe(el));
+    }
+
+    return () => {
+      window.removeEventListener('resize', handler);
+      clearTimeout(t);
+      if (ro) ro.disconnect();
+    };
+  }, [branches]);
+
+  const addBranch = () => setBranches([...branches, { id: `b${Date.now()}`, amount: 0, t1: '', t2: '', t3: '', subBranches: [] }]);
+  const removeBranch = (id) => setBranches(branches.filter(b => b.id !== id));
+  const updateBranch = (id, field, value) => setBranches(branches.map(b => b.id === id ? { ...b, [field]: value } : b));
+  const addSubBranch = (bId) => setBranches(branches.map(b => b.id === bId ? { ...b, subBranches: [...b.subBranches, { id: `s${Date.now()}`, amount: 0, t1: '', t2: '', note: '' }] } : b));
+  const removeSubBranch = (bId, sId) => setBranches(branches.map(b => b.id === bId ? { ...b, subBranches: b.subBranches.filter(s => s.id !== sId) } : b));
+  const updateSubBranch = (bId, sId, field, value) => setBranches(branches.map(b => b.id === bId ? { ...b, subBranches: b.subBranches.map(s => s.id === sId ? { ...s, [field]: value } : s) } : b));
+
+  const sum = (arr) => arr.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+  const totalIncome = sum(incomes);
+  const totalLiving = sum(livingExps);
+  const totalSaving = sum(savingExps);
+  const totalInsurance = sum(insuranceExps);
+  const totalExpense = totalLiving + totalSaving + totalInsurance;
+  const totalAssets = sum(assets);
+  const totalLoans = sum(loans);
+  const netWorth = totalAssets - totalLoans;
+  const actualSavingsPool = totalIncome - totalLiving - totalInsurance;
+
+  const distributeTo100 = (values) => {
+    const floors = values.map(v => Math.floor(v));
+    let remainder = 100 - floors.reduce((a, b) => a + b, 0);
+    const order = values.map((v, i) => ({ i, frac: v - floors[i] })).sort((a, b) => b.frac - a.frac);
+    const result = [...floors];
+    for (let k = 0; k < remainder && k < order.length; k++) {
+      result[order[k].i] += 1;
+    }
+    return result;
+  };
+  const rawLivingPct = totalIncome ? (totalLiving / totalIncome) * 100 : 0;
+  const rawSavingPct = totalIncome ? (actualSavingsPool / totalIncome) * 100 : 0;
+  const rawInsurancePct = totalIncome ? (totalInsurance / totalIncome) * 100 : 0;
+  const [livingPct, savingPct, insurancePct] = totalIncome
+    ? distributeTo100([rawLivingPct, rawSavingPct, rawInsurancePct])
+    : [0, 0, 0];
+
+  const handleItemChange = (setter, items, id, field, value) => setter(items.map(item => item.id === id ? { ...item, [field]: value } : item));
+  const addItem = (setter, items) => setter([...items, { id: Date.now(), name: '', amount: 0, note: '' }]);
+  const removeItem = (setter, items, id) => setter(items.filter(item => item.id !== id));
+
+  const reportRef2 = useRef(null);
+  const [isDownloading2, setIsDownloading2] = useState(false);
+
+  // 📝 【修正重點】：強化平板/手機環境下的下載與截圖邏輯
+  const downloadRef = async (ref, setBusy, filename) => {
+    if (!ref.current) return;
+    setBusy(true);
+    
+    try {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // 動態調整 scale：若是小螢幕裝置(手機/平板)，降低解析度以免 html2canvas 超出記憶體上限
+      const scale = window.innerWidth < 1024 ? 1.5 : 2;
+      const canvas = await html2canvas(ref.current, { 
+        scale: scale, 
+        useCORS: true, 
+        backgroundColor: '#ffffff' 
+      });
+
+      // 建立備用的下載機制
+      const fallbackDownload = (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.style.display = "none";
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => window.URL.revokeObjectURL(url), 100);
+      };
+
+      // 轉換為 Blob 物件 (處理行動裝置對 Base64 長度與下載的限制)
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          alert("圖片生成失敗！");
+          setBusy(false);
+          return;
+        }
+
+        const file = new File([blob], filename, { type: blob.type });
+
+        // 嘗試喚起行動裝置原生的「分享/儲存圖片」選單 (iOS Safari 的最佳解)
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: filename,
+            });
+          } catch (err) {
+            // 用戶取消分享時不強制觸發下載，其他錯誤則退回備用下載
+            if (err.name !== 'AbortError') {
+              fallbackDownload(blob);
+            }
+          }
+        } else {
+          // 不支援 Web Share 的環境 (如傳統桌面版瀏覽器) 執行正常下載
+          fallbackDownload(blob);
+        }
+        
+        setBusy(false);
+      }, "image/png", 1.0);
+
+    } catch (error) {
+      console.error("輸出圖片失敗:", error);
+      alert("輸出圖片失敗，請嘗試使用桌面版瀏覽器。");
+      setBusy(false);
+    }
+  };
+
+  const handleDownloadImage = () => downloadRef(reportRef, setIsDownloading, `財務分配報表_${userName}.png`);
+  const handleDownloadImage2 = () => downloadRef(reportRef2, setIsDownloading2, `財務規劃紀錄_${userName}.png`);
+  
+  const [showExportMenu, setShowExportMenu] = useState(false);
+  const isDownloadingAny = isDownloading || isDownloading2;
+  const handleDownloadBoth = async () => {
+    await handleDownloadImage();
+    await new Promise(r => setTimeout(r, 500));
+    await handleDownloadImage2();
+  };
+
+  const RenderList = ({ items, isSaving = false }) => (
+    <div className="flex flex-col gap-1.5 mt-3">{items.map(item => (<div key={item.id} className="group flex items-center justify-between py-2.5 px-1 rounded-lg transition-colors" style={{}} onMouseEnter={e=>e.currentTarget.style.background='var(--paper)'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}><div className="flex items-center gap-2.5"><span className="font-bold text-[14.5px]" style={{color:'var(--ink)'}}>{item.name || '-'}</span>{item.note && (<span className="text-[11px] px-2.5 py-0.5 rounded-full font-bold" style={{background: isSaving ? 'var(--income-bg)' : 'var(--expense-bg)', color: isSaving ? 'var(--income-deep)' : 'var(--expense-deep)'}}>{item.note}</span>)}</div><span className="font-num font-extrabold text-[15.5px]" style={{color:'var(--ink)'}}>{item.amount > 0 ? Number(item.amount).toLocaleString() : '-'}</span></div>))}</div>
+  );
+
+  const InputGroup = ({ label, value, onChange, placeholder, type = "text" }) => (
+    <div className="flex flex-col gap-1"><label className="text-[10.5px] font-bold tracking-wider pl-1 uppercase" style={{color:'#a8a49a'}}>{label}</label>{type === "number" ? (<MoneyInput value={value} onChange={v => onChange({ target: { value: v } })} placeholder={placeholder} className="rounded-lg p-2.5 text-sm outline-none transition-colors" style={{background:'#f5f4ef', border:'1.5px solid #e7e5dd', color:'var(--ink)'}}/>) : (<input type={type} value={value} onChange={onChange} className="rounded-lg p-2.5 text-sm outline-none transition-colors" style={{background:'#f5f4ef', border:'1.5px solid #e7e5dd', color:'var(--ink)'}} onFocus={e => e.target.style.borderColor = '#5271e0'} onBlur={e => e.target.style.borderColor = '#e7e5dd'} placeholder={placeholder}/>)}</div>
+  );
+
+  return (
+    <div className="min-h-screen flex flex-col xl:h-screen" style={{background:'var(--paper)'}}>
+      {/* Header */}
+      <div className="px-6 py-4 flex justify-between items-center print:hidden z-20 shrink-0" style={{background:'var(--card)', borderBottom:'1px solid var(--line)'}}>
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{background:'linear-gradient(135deg, var(--income), var(--assets))'}}>
+            <IconChart color="#ffffff" />
+          </div>
+          <div>
+            <h1 className="font-display text-lg font-extrabold tracking-tight" style={{color:'var(--ink)'}}>全方位財務分配報表</h1>
+            <p className="text-[11px] font-num font-bold tracking-[0.2em] uppercase" style={{color:'#b7b3a8'}}>Architecture of Wealth · v9</p>
+          </div>
+        </div>
+        <div className="relative">
+          <button onClick={() => setShowExportMenu(v => !v)} disabled={isDownloadingAny} className={`px-6 py-3 rounded-full font-bold transition-all text-sm tracking-wide flex items-center gap-2 text-white shadow-[0_4px_14px_rgba(82,113,224,0.35)] ${isDownloadingAny ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-[0_6px_20px_rgba(82,113,224,0.45)] hover:-translate-y-0.5'}`} style={{background:'var(--assets)'}}>
+            {isDownloadingAny ? '⏳ 正在處理中...' : '⬇ 輸出報表'}
+          </button>
+          {showExportMenu && !isDownloadingAny && (
+            <>
+              <div className="fixed inset-0 z-30" onClick={() => setShowExportMenu(false)}></div>
+              <div className="absolute right-0 mt-2 w-56 rounded-2xl overflow-hidden z-40" style={{background:'var(--card)', boxShadow:'0 12px 32px rgba(34,37,43,0.16)', border:'1px solid var(--line)'}}>
+                <button onClick={() => { setShowExportMenu(false); handleDownloadImage(); }} className="w-full text-left px-5 py-3.5 text-sm font-bold transition-colors hover:bg-black/[0.03]" style={{color:'var(--ink)'}}>
+                  只輸出第一頁<div className="text-[11px] font-medium mt-0.5" style={{color:'#a8a49a'}}>財務分配報表</div>
+                </button>
+                <button onClick={() => { setShowExportMenu(false); handleDownloadImage2(); }} className="w-full text-left px-5 py-3.5 text-sm font-bold transition-colors hover:bg-black/[0.03]" style={{color:'var(--ink)', borderTop:'1px solid var(--line)'}}>
+                  只輸出第二頁<div className="text-[11px] font-medium mt-0.5" style={{color:'#a8a49a'}}>財務規劃紀錄</div>
+                </button>
+                <button onClick={() => { setShowExportMenu(false); handleDownloadBoth(); }} className="w-full text-left px-5 py-3.5 text-sm font-bold transition-colors hover:bg-black/[0.03]" style={{color:'var(--assets-deep)', background:'var(--assets-bg)', borderTop:'1px solid var(--line)'}}>
+                  兩頁都輸出<div className="text-[11px] font-medium mt-0.5" style={{color:'var(--assets)'}}>下載兩張 PNG 圖片</div>
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div className="flex-1 flex flex-col xl:flex-row xl:overflow-hidden relative">
+        {/* 左側：編輯器 */}
+        <div className="w-full xl:w-[450px] xl:overflow-y-auto p-6 print:hidden z-10 shrink-0 custom-scrollbar" style={{background:'#ffffff', borderRight:'1px solid var(--line)'}}>
+          <div className="space-y-9 pb-20">
+            <section>
+              <h2 className="font-bold text-[11px] mb-3 tracking-widest uppercase" style={{color:'#a8a49a'}}>Client Profile 客戶資料</h2>
+              <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)} className="w-full rounded-xl p-3.5 font-bold outline-none text-base transition-colors mb-3" style={{background:'#f5f4ef', border:'1.5px solid #e7e5dd', color:'var(--ink)'}} placeholder="請輸入報表擁有者姓名" />
+              <label className="text-[10.5px] font-bold tracking-wider pl-1 uppercase" style={{color:'#a8a49a'}}>專屬財務顧問</label>
+              <input type="text" value={advisorName} onChange={(e) => setAdvisorName(e.target.value)} className="w-full rounded-xl p-3.5 font-bold outline-none text-base transition-colors mt-1" style={{background:'#f5f4ef', border:'1.5px solid #e7e5dd', color:'var(--ink)'}} placeholder="請輸入顧問姓名" />
+            </section>
+            
+            {[{ title: "Income", name: "收入", data: incomes, setter: setIncomes, tone:"income" },{ title: "Living", name: "生活消費支出", data: livingExps, setter: setLivingExps, tone:"expense" },{ title: "Investment", name: "理財型支出", data: savingExps, setter: setSavingExps, tone:"expense" },{ title: "Insurance", name: "保障型支出", data: insuranceExps, setter: setInsuranceExps, tone:"expense" },{ title: "Assets", name: "資產", data: assets, setter: setAssets, tone:"assets" },{ title: "Loans", name: "貸款", data: loans, setter: setLoans, tone:"loan" }].map((section, sIdx) => (
+              <section key={sIdx}>
+                <div className="flex justify-between items-center mb-3.5">
+                  <h2 className="font-bold text-[11px] tracking-widest uppercase" style={{color:'#a8a49a'}}>{section.title} <span style={{color:'#c7c4ba'}} className="ml-1">{section.name}</span></h2>
+                  <button onClick={() => addItem(section.setter, section.data)} className="text-[11px] font-bold tracking-wider px-3 py-1.5 rounded-full" style={{color:`var(--${section.tone}-deep)`, background:`var(--${section.tone}-bg)`}}>+ 新增</button>
+                </div>
+                <div className="space-y-2.5">
+                  {section.data.map(item => (
+                    <div key={item.id} className="flex gap-2 relative group p-2 rounded-xl" style={{background:'#f9f8f4', border:'1px solid #eeece4'}}>
+                      <input type="text" value={item.name} onChange={e => handleItemChange(section.setter, section.data, item.id, 'name', e.target.value)} className="w-[40%] bg-transparent border-none p-2 text-sm outline-none" style={{color:'var(--ink)'}} placeholder="項目名稱"/>
+                      <MoneyInput value={item.amount} onChange={v => handleItemChange(section.setter, section.data, item.id, 'amount', v)} className="w-2/5 bg-transparent p-2 text-sm outline-none" style={{borderLeft:'1px solid #e7e5dd', color:'var(--ink)'}} placeholder="金額"/>
+                      {section.title === "Investment" && (<input type="text" value={item.note} onChange={e => handleItemChange(section.setter, section.data, item.id, 'note', e.target.value)} className="w-1/5 bg-transparent p-2 text-xs outline-none" style={{borderLeft:'1px solid #e7e5dd', color:'#a8a49a'}} placeholder="備註"/>)}
+                      <button onClick={() => removeItem(section.setter, section.data, item.id)} className="absolute -right-2 -top-2 w-5 h-5 rounded-full flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-all text-white" style={{background:'var(--danger)'}}>✕</button>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+
+            <section>
+              <div className="flex justify-between items-center mb-5">
+                <h2 className="font-bold text-[11px] tracking-widest uppercase" style={{color:'#a8a49a'}}>Tree Logic <span style={{color:'#c7c4ba'}} className="ml-1">樹狀圖邏輯</span></h2>
+                <button onClick={addBranch} className="text-[11px] font-bold tracking-wider px-3 py-1.5 rounded-full" style={{color:'var(--expense-deep)', background:'var(--expense-bg)'}}>+ 新分支</button>
+              </div>
+              {branches.map((b, i) => (
+                <div key={b.id} className="mb-6 p-5 rounded-2xl relative" style={{background:'#f9f8f4', border:'1px solid #eeece4'}}>
+                  <div className="flex justify-between items-center mb-4">
+                    <div className="font-black text-sm px-3 py-1.5 rounded-lg text-white" style={{background:'var(--assets)'}}>主分支 {i + 1}</div>
+                    <div className="flex gap-2">
+                      <button onClick={() => addSubBranch(b.id)} className="text-xs font-bold px-3 py-1.5 rounded-full" style={{color:'var(--assets-deep)', background:'var(--assets-bg)'}}>+ 子層</button>
+                      <button onClick={() => removeBranch(b.id)} className="text-xs font-bold px-3 py-1.5 rounded-full" style={{color:'#b5443a', background:'var(--danger-bg)'}}>刪除</button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3.5 mb-4">
+                    <InputGroup label="金額" value={b.amount} onChange={e => updateBranch(b.id, 'amount', e.target.value)} type="number" placeholder="例: 10000" />
+                    <InputGroup label="用途 (標題1)" value={b.t1} onChange={e => updateBranch(b.id, 't1', e.target.value)} placeholder="例: 活存" />
+                    <InputGroup label="備注 (標題2)" value={b.t2} onChange={e => updateBranch(b.id, 't2', e.target.value)} placeholder="例: (安全感)" />
+                    <InputGroup label="備註 (標題3)" value={b.t3} onChange={e => updateBranch(b.id, 't3', e.target.value)} placeholder="例: 國泰銀行" />
+                  </div>
+                  {b.subBranches.length > 0 && (
+                    <div className="pl-4 space-y-3.5 mt-5" style={{borderLeft:'2px solid #e7e5dd'}}>
+                      {b.subBranches.map((sub, j) => (
+                        <div key={sub.id} className="p-3.5 rounded-xl relative group" style={{background:'#ffffff', border:'1px solid #eeece4'}}>
+                          <button onClick={() => removeSubBranch(b.id, sub.id)} className="absolute top-2 right-2 text-sm opacity-0 group-hover:opacity-100" style={{color:'#c7c4ba'}}>✕</button>
+                          <div className="text-xs font-bold mb-2.5" style={{color:'#c7c4ba'}}>子分支 {j + 1}</div>
+                          <div className="grid grid-cols-2 gap-2.5">
+                            <InputGroup label="金額" value={sub.amount} onChange={e => updateSubBranch(b.id, sub.id, 'amount', e.target.value)} type="number" placeholder="數字" />
+                            <InputGroup label="用途" value={sub.t1} onChange={e => updateSubBranch(b.id, sub.id, 't1', e.target.value)} placeholder="名稱" />
+                            <InputGroup label="備注" value={sub.t2} onChange={e => updateSubBranch(b.id, sub.id, 't2', e.target.value)} placeholder="附註" />
+                            <InputGroup label="懸浮說明" value={sub.note} onChange={e => updateSubBranch(b.id, sub.id, 'note', e.target.value)} placeholder="詳細說明" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </section>
+
+            <section>
+              <h2 className="font-bold text-[11px] mb-4 tracking-widest uppercase" style={{color:'#a8a49a'}}>Page 2 <span style={{color:'#c7c4ba'}} className="ml-1">財務規劃紀錄</span></h2>
+              <div className="space-y-4">
+                {[{ label: '🎯 想完成的事', value: goals, setter: setGoals, ph: '例：3年內買房自住、45歲前存到退休金1000萬...' },{ label: '⚠️ 未來可能會遇到的事', value: futureEvents, setter: setFutureEvents, ph: '例：父母年邁的長照需求、換工作的收入空窗期...' },{ label: '🔍 理財盲點', value: blindSpots, setter: setBlindSpots, ph: '例：緊急預備金不足、保障集中在單一險種...' },{ label: '💡 理財建議', value: advice, setter: setAdvice, ph: '例：建議增加醫療險保額、設立3-6個月緊急預備金...' }].map((f, i) => (
+                  <div key={i} className="flex flex-col gap-1.5">
+                    <label className="text-[12px] font-bold" style={{color:'var(--ink)'}}>{f.label}</label>
+                    <textarea value={f.value} onChange={e => f.setter(e.target.value)} rows={4} className="w-full rounded-xl p-3 text-sm outline-none transition-colors resize-y" style={{background:'#f5f4ef', border:'1.5px solid #e7e5dd', color:'var(--ink)'}} onFocus={e => e.target.style.borderColor = '#5271e0'} onBlur={e => e.target.style.borderColor = '#e7e5dd'} placeholder={f.ph}/>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+        </div>
+
+        {/* --- 右側：報表預覽區 --- */}
+        <div className="flex-1 overflow-x-auto xl:overflow-y-auto p-4 md:p-8 xl:p-12 flex flex-col items-center gap-10 print:p-0 print:gap-0 custom-scrollbar" style={{background:'#f1efe8'}}>
+          
+          {/* === 第一頁：財務分配報表 === */}
+          <div ref={reportRef} className="p-14 xl:p-20 rounded-[2.5rem] w-[1440px] min-w-[1200px] print:w-full print:min-w-0 print:shadow-none print:p-0 relative flex flex-col" style={{background:'var(--card)', boxShadow:'0 40px 100px rgba(34,37,43,0.20), 0 14px 36px rgba(34,37,43,0.12), 0 4px 10px rgba(34,37,43,0.08)'}}>
+            <div className="absolute top-0 right-0 w-[620px] h-[620px] rounded-full glow-blob pointer-events-none" style={{background:'radial-gradient(circle, var(--income-bg) 0%, rgba(255,255,255,0) 68%)', transform:'translate(30%,-45%)'}}></div>
+            <div className="absolute bottom-0 left-0 w-[520px] h-[520px] rounded-full glow-blob pointer-events-none" style={{background:'radial-gradient(circle, var(--assets-bg) 0%, rgba(255,255,255,0) 68%)', transform:'translate(-25%,30%)'}}></div>
+            <div className="absolute left-[26%] top-16 bottom-16 w-px" style={{background:'var(--line)'}}></div>
+            <div className="absolute left-[58%] top-16 bottom-16 w-px" style={{background:'var(--line)'}}></div>
+            
+            <div className="grid grid-cols-12 gap-16 xl:gap-20 relative z-10 flex-1">
+              {/* 第一欄 */}
+              <div className="col-span-3 flex flex-col gap-10">
+                <div className="flex flex-col"><div className="mb-5"><CategoryChip icon={<IconCoin color="#9c6c14"/>} label="Income" zh="收入" tone="income" /></div><ValueBox value={totalIncome} /><div className="mt-3"><RenderList items={incomes} /></div></div>
+                <div className="flex flex-col flex-1 mt-4"><div className="mb-5"><CategoryChip icon={<IconWallet color="#1f7566"/>} label="Expense" zh="支出" tone="expense" /></div><ValueBox value={totalExpense} />
+                <div className="mt-4"><SectionTitle amount={totalLiving} icon={<IconHome color="#7a7f8a"/>}>生活消費支出</SectionTitle><RenderList items={livingExps} />
+                <SectionTitle amount={totalSaving} icon={<IconPiggy color="#7a7f8a"/>}>理財型支出</SectionTitle><RenderList items={savingExps} isSaving={true} />
+                <SectionTitle amount={totalInsurance} icon={<IconShield color="#7a7f8a"/>}>保障型支出</SectionTitle><RenderList items={insuranceExps} /></div></div>
+              </div>
+              
+              {/* 第二欄 */}
+              <div className="col-span-4 flex flex-col pt-2">
+                <div className="flex justify-center mb-12"><h2 className="font-display text-xl font-extrabold tracking-tight" style={{color:'var(--ink)'}}>人生黃金財務分配法則</h2></div>
+                <div className="p-10 rounded-[2rem] flex flex-col items-center flex-1 justify-center relative" style={{background:'var(--paper)'}}>
+                  <div className="text-[13px] font-bold tracking-widest mb-10 px-6 py-2.5 rounded-full z-10" style={{color:'var(--income-deep)', background:'var(--card)', boxShadow:'0 2px 10px rgba(220,154,38,0.15)'}}>生活支出 50-60%</div>
+                  <div className="relative w-64 aspect-[200/173] z-0"><svg viewBox="0 0 200 173" className="w-full h-full"><defs><linearGradient id="goldGrad" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stopColor="#f6d888" /><stop offset="100%" stopColor="#dc9a26" /></linearGradient></defs><path d="M 100 14 L 186 158 L 14 158 Z" fill="url(#goldGrad)" rx="20"/></svg><div className="absolute inset-0 flex items-center justify-center pt-8"><span className="font-display text-[19px] font-extrabold tracking-[0.25em] text-white">月收入</span></div></div>
+                  <div className="w-full flex justify-between px-4 mt-10 z-10"><div className="text-center w-[45%]"><div className="text-[15px] font-bold" style={{color:'var(--ink)'}}>儲蓄理財</div><div className="text-[13px] mt-1.5 font-num font-bold" style={{color:'var(--ink-soft)'}}>30-40%</div></div><div className="text-center w-[45%]"><div className="text-[15px] font-bold" style={{color:'var(--ink)'}}>風險保障</div><div className="text-[13px] mt-1.5 font-num font-bold" style={{color:'var(--ink-soft)'}}>10-20%</div></div></div>
+                </div>
+                <div className="mt-10 pt-8" style={{borderTop:'1.5px solid var(--line)'}}><div className="flex justify-between items-end mb-6"><span className="font-display font-extrabold tracking-tight text-lg flex items-center gap-2" style={{color:'var(--ink)'}}><IconChart color="#5271e0" /> 資產總覽 ASSETS</span><span className="font-num font-extrabold text-2xl" style={{color:'var(--assets)'}}>${totalAssets.toLocaleString()}</span></div><div className="space-y-1">{assets.map(item => (<div key={item.id} className="flex justify-between items-center py-2.5 px-1 rounded-lg text-base" style={{borderBottom:'1px solid var(--line)'}}><span className="font-medium" style={{color:'var(--ink-soft)'}}>{item.name}</span><span className="font-num font-bold" style={{color:'var(--ink)'}}>{item.amount > 0 ? `$ ${Number(item.amount).toLocaleString()}` : '-'}</span></div>))}</div></div>
+                <div className="mt-8 pt-8" style={{borderTop:'1.5px solid var(--line)'}}><div className="flex justify-between items-end mb-6"><span className="font-display font-extrabold tracking-tight text-lg flex items-center gap-2" style={{color:'var(--ink)'}}><IconWallet color="#c15c50" /> 貸款總覽 LIABILITIES</span><span className="font-num font-extrabold text-2xl" style={{color:'var(--loan)'}}>${totalLoans.toLocaleString()}</span></div><div className="space-y-1">{loans.map(item => (<div key={item.id} className="flex justify-between items-center py-2.5 px-1 rounded-lg text-base" style={{borderBottom:'1px solid var(--line)'}}><span className="font-medium" style={{color:'var(--ink-soft)'}}>{item.name}</span><span className="font-num font-bold" style={{color:'var(--ink)'}}>{item.amount > 0 ? `$ ${Number(item.amount).toLocaleString()}` : '-'}</span></div>))}</div><div className="flex justify-between items-center mt-4 pt-4 px-1" style={{borderTop:'1.5px dashed var(--line)'}}><span className="font-bold text-[14px]" style={{color:'var(--ink)'}}>淨資產 NET WORTH</span><span className="font-num font-extrabold text-xl" style={{color: netWorth >= 0 ? 'var(--assets)' : 'var(--loan)'}}>${netWorth.toLocaleString()}</span></div></div>
+              </div>
+              
+              {/* 第三欄 */}
+              <div className="col-span-5 flex flex-col items-center pt-2">
+                <div className="flex justify-center mb-12"><h2 className="font-display text-xl font-extrabold tracking-tight" style={{color:'var(--ink)'}}>實際 <span style={{color:'var(--assets)'}} className="mx-1">{userName}</span> 財務分配</h2></div>
+                <div className="w-full flex flex-col items-center">
+                  <div className="flex flex-col items-center mb-8 z-10"><span className="font-num font-extrabold text-[32px] tracking-tight" style={{color:'var(--ink)'}}>${totalLiving.toLocaleString()}</span><span className="text-[12px] font-bold tracking-widest mt-1.5 px-4 py-1 rounded-full font-num" style={{background:'var(--assets-bg)', color:'var(--assets-deep)'}}>{livingPct}%</span></div>
+                  <div className="relative w-72 aspect-[200/173] z-0"><svg viewBox="0 0 200 173" className="w-full h-full"><defs><linearGradient id="blueGrad" x1="50%" y1="0%" x2="50%" y2="100%"><stop offset="0%" stopColor="#9db1ef" /><stop offset="100%" stopColor="#5271e0" /></linearGradient></defs><path d="M 100 14 L 190 158 L 10 158 Z" fill="url(#blueGrad)"/></svg><div className="absolute inset-0 flex flex-col items-center justify-center pt-12"><span className="font-num text-[27px] font-extrabold text-white tracking-tight">${totalIncome.toLocaleString()}</span><span className="w-10 h-[3px] bg-white mt-1.5 opacity-50 rounded-full"></span></div></div>
+                  <div className="w-full flex justify-between px-6 mt-8 z-10 relative"><div className="flex flex-col items-center relative w-[46%]"><span className="font-num font-extrabold text-2xl tracking-tight" style={{color:'var(--ink)'}}>${actualSavingsPool.toLocaleString()}</span><span className="text-[12px] font-bold tracking-widest mt-1.5 px-4 py-1 rounded-full font-num" style={{background:'var(--income-bg)', color:'var(--income-deep)'}}>{savingPct}%</span></div>
+                  <div className="flex flex-col items-center w-[46%]"><span className="font-num font-extrabold text-2xl tracking-tight" style={{color:'var(--ink)'}}>${totalInsurance.toLocaleString()}</span><span className="text-[12px] font-bold tracking-widest mt-1.5 px-4 py-1 rounded-full font-num" style={{background:'var(--expense-bg)', color:'var(--expense-deep)'}}>{insurancePct}%</span>{insuranceExps[0] && (<div className="font-medium text-[12px] mt-3 pt-1.5" style={{color:'var(--ink-soft)', borderTop:'1px solid var(--line)'}}>{insuranceExps[0].name}</div>)}</div></div>
+                </div>
+                
+                {/* 樹狀圖 */}
+                <div className="w-full mt-6 relative" ref={treeWrapRef}>
+                  {branches.length > 0 && (<div className="w-full h-16 relative overflow-visible"><svg width={mainLine.width || '100%'} height="64" style={{position:'absolute', inset:0, overflow:'visible'}}><circle cx={mainLine.width * 0.25} cy="0" r="4" fill="var(--assets)" />{branches.map((b, i) => {const tx = mainLine.points[i] || 0; return (<React.Fragment key={`line-${b.id}`}><line x1={mainLine.width * 0.25} y1="0" x2={tx} y2="64" stroke="#e7e5dd" strokeWidth="2.5" strokeLinecap="round" /><circle cx={tx} cy="64" r="4" fill="#d8d5cc" /></React.Fragment>);})}</svg></div>)}
+                  <div className="flex w-full gap-5 mt-2 items-start">{branches.map((branch, idx) => (
+                    <div key={branch.id} className="flex flex-col items-center z-10" style={{ flexGrow: 1 + branch.subBranches.length * 0.55, flexBasis: 0, minWidth: 0 }}>
+                      <div ref={el => branchCardRefs.current[branch.id] = el} className="w-full py-4 px-2 text-center rounded-2xl hover:-translate-y-1 transition-transform" style={{background:'var(--assets-bg)', boxShadow:'0 16px 34px rgba(34,37,43,0.18), 0 6px 14px rgba(34,37,43,0.11), 0 2px 4px rgba(34,37,43,0.08)', borderTop:'3px solid var(--assets)'}}><div className="font-num text-[20px] font-extrabold tracking-tight" style={{color:'var(--ink)'}}>{Number(branch.amount).toLocaleString()}</div>{branch.t1 && <div className="font-bold text-[14px] mt-2" style={{color:'var(--expense-deep)'}}>{branch.t1}</div>}{branch.t2 && <div className="text-[12px] font-medium mt-1" style={{color:'var(--ink-soft)'}}>{branch.t2}</div>}{branch.t3 && !branch.subBranches.length && (<div className="font-bold text-[12px] mt-2 pt-1.5" style={{color:'var(--ink-soft)', borderTop:'1px solid var(--line)'}}>{branch.t3}</div>)}</div>
+                      {branch.subBranches.length > 0 && (<div ref={el => subWrapRefs.current[branch.id] = el} className="relative flex flex-col items-center w-full mt-1"><div className="w-full h-11 relative"><svg width={(subLines[branch.id] && subLines[branch.id].width) || '100%'} height="44" style={{position:'absolute', inset:0, overflow:'visible'}}><circle cx={(subLines[branch.id] && subLines[branch.id].origin) || 0} cy="0" r="3" fill="#d8d5cc" />{branch.subBranches.map((sub, j) => {const sx = (subLines[branch.id] && subLines[branch.id].points[j]) || 0; const originX = (subLines[branch.id] && subLines[branch.id].origin) || 0; return (<React.Fragment key={`subline-${sub.id}`}><line x1={originX} y1="0" x2={sx} y2="44" stroke="#eeece4" strokeWidth="2" strokeLinecap="round" /><circle cx={sx} cy="44" r="2.5" fill="#d8d5cc" /></React.Fragment>);})}</svg></div>
+                      <div className="flex w-full gap-2 mt-1">{branch.subBranches.map((sub, j) => (<div key={sub.id} className="flex-1 relative flex flex-col items-center group"><div ref={el => { if (!subCardRefs.current[branch.id]) subCardRefs.current[branch.id] = {}; subCardRefs.current[branch.id][sub.id] = el; }} className="w-full py-3 px-1 text-center hover:-translate-y-1 transition-transform rounded-xl" style={{background:'var(--expense-bg)', boxShadow:'0 12px 26px rgba(34,37,43,0.15), 0 4px 10px rgba(34,37,43,0.09)', borderTop:'2px solid var(--expense)'}}><div className="font-num text-[15px] font-extrabold tracking-tight" style={{color:'var(--ink)'}}>{Number(sub.amount).toLocaleString()}</div>{sub.t1 && <div className="font-bold text-[11.5px] mt-1.5" style={{color:'var(--expense-deep)'}}>{sub.t1}</div>}{sub.t2 && <div className="font-medium text-[10.5px] mt-1" style={{color:'var(--ink-soft)'}}>{sub.t2}</div>}</div>{sub.note && (<div className="absolute top-full mt-3 left-1/2 -translate-x-1/2 w-max max-w-[140px] shadow-xl p-2.5 text-[11.5px] text-center leading-tight z-30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none text-white rounded-lg" style={{background:'var(--ink)'}}><div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rotate-45" style={{background:'var(--ink)'}}></div><span className="relative z-10">{sub.note}</span></div>)}</div>))}</div></div>)}
+                    </div>
+                  ))}</div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-20 pt-8 flex justify-between items-center w-full" style={{borderTop:'1.5px solid var(--line)'}}><div className="flex items-center gap-2.5 text-[13px] font-medium" style={{color:'var(--ink-soft)'}}><span className="w-1.5 h-1.5 rounded-full" style={{background:'var(--income)'}}></span>撿起散落的財務碎片，拼湊出夢想真實的形狀。</div><div className="px-5 py-2.5 rounded-full font-bold text-sm" style={{background:'var(--assets-bg)', color:'var(--assets-deep)'}}>專屬財務顧問 {advisorName}</div></div>
+          </div>
+
+          {/* === 第二頁：財務規劃紀錄 === */}
+          <div ref={reportRef2} className="page-break p-14 xl:p-20 rounded-[2.5rem] w-[1440px] min-w-[1200px] print:w-full print:min-w-0 print:shadow-none print:p-14 relative flex flex-col" style={{background:'var(--card)', boxShadow:'0 40px 100px rgba(34,37,43,0.20), 0 14px 36px rgba(34,37,43,0.12), 0 4px 10px rgba(34,37,43,0.08)'}}>
+            <div className="absolute top-0 right-0 w-[560px] h-[560px] rounded-full glow-blob pointer-events-none" style={{background:'radial-gradient(circle, var(--income-bg) 0%, rgba(255,255,255,0) 68%)', transform:'translate(30%,-40%)'}}></div>
+            <div className="absolute bottom-0 left-0 w-[520px] h-[520px] rounded-full glow-blob pointer-events-none" style={{background:'radial-gradient(circle, var(--assets-bg) 0%, rgba(255,255,255,0) 68%)', transform:'translate(-25%,35%)'}}></div>
+            
+            <div className="text-center mb-16 relative z-10"><div className="flex w-fit items-center gap-2 px-4 py-1.5 rounded-full mb-4 mx-auto" style={{background:'var(--assets-bg)'}}><span className="w-1.5 h-1.5 rounded-full" style={{background:'var(--assets)'}}></span><span className="font-num text-[11px] font-bold tracking-[0.2em]" style={{color:'#37509e'}}>PAGE 2</span></div><h2 className="font-display text-2xl font-extrabold tracking-tight" style={{color:'var(--ink)'}}>{userName} 的財務規劃旅程</h2></div>
+            
+            <div className="relative z-10 flex-1 max-w-[880px] mx-auto w-full">
+              {[{ label: '想完成的事', sub: 'GOALS', value: goals, tone: 'assets', Icon: IconTarget, ph: '例：3年內買房自住、45歲前存到退休金1000萬...' },{ label: '未來可能會遇到的事', sub: 'WHAT MAY COME', value: futureEvents, tone: 'assets', Icon: IconAlert, ph: '例：父母年邁的長照需求、換工作的收入空窗期...' },{ label: '理財盲點', sub: 'BLIND SPOTS', value: blindSpots, tone: 'assets', Icon: IconSearch, ph: '例：緊急預備金不足、保障集中在單一險種...' },].map((f, i) => (
+                <div key={i} className="flex gap-6"><div className="flex flex-col items-center"><div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0" style={{background: '#eef1fd'}}><f.Icon color="#37509e" /></div><div className="w-px flex-1 my-2" style={{background:'var(--line)', minHeight:'24px'}}></div></div><div className="flex-1 pb-10"><div className="font-num text-[10.5px] font-bold tracking-[0.2em] uppercase mb-1" style={{color: '#37509e'}}>{f.sub}</div><h3 className="font-display text-[17px] font-extrabold mb-3" style={{color:'var(--ink)'}}>{f.label}</h3><div className="rounded-2xl p-5" style={{background:'var(--paper)', border:'1px solid var(--line)'}}><p className="text-[14.5px] leading-relaxed whitespace-pre-wrap" style={{color: f.value ? 'var(--ink-soft)' : '#c7c4ba'}}>{f.value || '（尚未填寫）'}</p></div></div></div>
+              ))}
+              {/* 理財建議 */}
+              <div className="flex gap-6"><div className="flex flex-col items-center"><div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0" style={{background:'var(--assets-bg)'}}><IconBulb color="#37509e" /></div></div><div className="flex-1"><div className="font-num text-[10.5px] font-bold tracking-[0.2em] uppercase mb-1" style={{color:'var(--assets-deep)'}}>ADVICE</div><h3 className="font-display text-[17px] font-extrabold mb-3" style={{color:'var(--ink)'}}>理財建議</h3><div className="rounded-2xl p-5" style={{background:'var(--paper)', border:'1px solid var(--line)'}}><p className="text-[14.5px] leading-relaxed whitespace-pre-wrap" style={{color: advice ? 'var(--ink-soft)' : '#c7c4ba'}}>{advice || '（尚未填寫）'}</p></div></div></div>
+            </div>
+            
+            <div className="mt-16 pt-8 flex justify-between items-center w-full relative z-10" style={{borderTop:'1.5px solid var(--line)'}}><div className="flex items-center gap-2.5 text-[13px] font-medium" style={{color:'var(--ink-soft)'}}><span className="w-1.5 h-1.5 rounded-full" style={{background:'var(--income)'}}></span>每一步規劃，都是為了讓未來的自己更安心。</div><div className="px-5 py-2.5 rounded-full font-bold text-sm" style={{background:'var(--assets-bg)', color:'var(--assets-deep)'}}>專屬財務顧問 {advisorName}</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script></body></html>
