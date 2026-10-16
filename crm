@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>客戶關係管理系統 - 財務顧問團隊</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --paper:#faf9f6; --card:#ffffff; --ink:#22252b; --ink-soft:#7a7f8a; --line:#edece6;
+  --assets:#5271e0; --assets-bg:#eef1fd; --assets-deep:#37509e;
+  --income:#dc9a26; --income-bg:#fdf4e0; --income-deep:#9c6c14;
+}
+body{ font-family:'Noto Sans TC', sans-serif; background-color: var(--paper); }
+.font-display{ font-family:'Manrope','Noto Sans TC', sans-serif; }
+/* 隱藏捲軸但可滾動 */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.animate-fade { animation: fadeIn 0.2s ease-out forwards; }
+.animate-slide-up { animation: slideUp 0.3s ease-out forwards; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+// ============ Supabase 設定 (請與 report.html 保持一致) ============
+const SUPABASE_URL = 'https://roiupxausybcfplexwsk.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_Jlalv3BaKF4-2TRpDRx7CQ_X5ILexY_';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// 定義行銷流程階段
+const PIPELINE_STAGES = [
+  { id: '名單收集', color: '#94a3b8', bg: '#f1f5f9' },
+  { id: '初次接觸', color: '#8b5cf6', bg: '#ede9fe' },
+  { id: '需求分析', color: '#3b82f6', bg: '#dbeafe' },
+  { id: '建議書遞交', color: '#dc9a26', bg: '#fdf4e0' },
+  { id: '簽約成交', color: '#10b981', bg: '#d1fae5' },
+  { id: '售後服務', color: '#14b8a6', bg: '#ccfbf1' },
+  { id: '暫緩跟進', color: '#ef4444', bg: '#fee2e2' }
+];
+
+const CRMApp = ({ session }) => {
+  const currentUserId = session.user.id;
+  const [clients
