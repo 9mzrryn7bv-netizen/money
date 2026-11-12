@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>全方位財務分配報表 - 全螢幕標籤展開版 v15</title>
+<title>全方位財務分配報表 - 全螢幕標籤展開版 v16 (完美輸出與對位修復版)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700;800;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -92,6 +92,31 @@ const CategoryChip = ({ icon, label, zh, tone }) => { const c = TONE_COLORS[tone
 const ValueBox = ({ value, size="text-4xl" }) => (<div className="flex items-baseline gap-1.5"><span className="text-lg font-num font-bold" style={{color:'#c7c4ba'}}>$</span><span className={`font-num font-extrabold tracking-tight ${size}`} style={{color:'var(--ink)'}}>{value.toLocaleString()}</span></div>);
 const SectionTitle = ({ children, amount, icon }) => (<div className="flex items-center justify-between pb-2.5 mt-6 mb-4" style={{borderBottom:'1.5px solid var(--line)'}}><h3 className="font-bold text-[14.5px] flex items-center gap-2" style={{color:'var(--ink)'}}>{icon}{children}</h3>{amount !== undefined && (<span className="font-num font-bold tracking-wide text-[14.5px]" style={{color:'var(--ink-soft)'}}>${amount.toLocaleString()}</span>)}</div>);
 
+const RenderList = ({ items, isSaving = false }) => (
+  <div className="flex flex-col gap-1.5 mt-3">
+    {items.filter(item => Number(item.amount) > 0).map(item => (
+      <div key={item.id} className="group flex items-center justify-between py-2.5 px-1 rounded-lg transition-colors" onMouseEnter={e=>e.currentTarget.style.background='var(--paper)'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
+        <div className="flex items-center gap-2.5">
+          <span className="font-bold text-[14.5px]" style={{color:'var(--ink)'}}>{item.name || '-'}</span>
+          {item.note && (<span className="text-[11px] px-2.5 py-0.5 rounded-full font-bold" style={{background: isSaving ? 'var(--income-bg)' : 'var(--income-deep)' , color: isSaving ? 'var(--income-deep)' : 'var(--expense-deep)'}}>{item.note}</span>)}
+        </div>
+        <span className="font-num font-extrabold text-[15.5px]" style={{color:'var(--ink)'}}>{Number(item.amount).toLocaleString()}</span>
+      </div>
+    ))}
+  </div>
+);
+
+const InputGroup = ({ label, value, onChange, placeholder, type = "text" }) => (
+  <div className="flex flex-col gap-1">
+    <label className="text-[10.5px] font-bold tracking-wider pl-1 uppercase" style={{color:'#a8a49a'}}>{label}</label>
+    {type === "number" ? (
+      <MoneyInput value={value} onChange={v => onChange({ target: { value: v } })} placeholder={placeholder} className="rounded-lg p-2.5 text-sm outline-none transition-colors" style={{background:'#f5f4ef', border:'1.5px solid #e7e5dd', color:'var(--ink)'}}/>
+    ) : (
+      <input type={type} value={value} onChange={onChange} className="rounded-lg p-2.5 text-sm outline-none transition-colors" style={{background:'#f5f4ef', border:'1.5px solid #e7e5dd', color:'var(--ink)'}} onFocus={e => e.target.style.borderColor = '#5271e0'} onBlur={e => e.target.style.borderColor = '#e7e5dd'} placeholder={placeholder}/>
+    )}
+  </div>
+);
+
 // ============ 登入畫面 ============
 const LoginScreen = ({ onLogin }) => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -151,10 +176,8 @@ const ReportApp = ({ session }) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isDownloading2, setIsDownloading2] = useState(false);
 
-  // 決定目前是「編輯資料頁 (edit)」還是「產生報表頁 (report)」
   const [viewMode, setViewMode] = useState('edit');
 
-  // 狀態管理 - 報表數據
   const [userName, setUserName] = useState('');
   const [advisorName, setAdvisorName] = useState('');
   const [incomes, setIncomes] = useState([{ id: 1, name: '', amount: 0, note: '' }]);
@@ -169,7 +192,6 @@ const ReportApp = ({ session }) => {
   const [advice, setAdvice] = useState('');
   const [branches, setBranches] = useState([{ id: 'b1', amount: 0, t1: '', t2: '', t3: '', subBranches: [] }]);
 
-  // UI 狀態管理 (標籤)
   const [activeTab, setActiveTab] = useState('basic');
 
   const tabs = [
@@ -183,7 +205,7 @@ const ReportApp = ({ session }) => {
     { id: 'page2', label: '📝 規劃紀錄' }
   ];
 
-  // ---- 樹狀圖連接線 ----
+  // ---- 修復點 1：樹狀圖連接線強化對位 ----
   const treeWrapRef = useRef(null);
   const branchCardRefs = useRef({});
   const subWrapRefs = useRef({});
@@ -194,6 +216,8 @@ const ReportApp = ({ session }) => {
   const measureTree = () => {
     if (!treeWrapRef.current) return;
     const treeRect = treeWrapRef.current.getBoundingClientRect();
+    if(treeRect.width === 0) return; // 避免還沒畫出來就計算
+    
     const points = branches.map(b => {
       const el = branchCardRefs.current[b.id];
       if (!el) return 0;
@@ -235,7 +259,19 @@ const ReportApp = ({ session }) => {
   };
 
   const measureTreeRef = useRef(measureTree); measureTreeRef.current = measureTree;
-  useLayoutEffect(() => { measureTree(); }, [branches]);
+  
+  // 讓 viewMode 也成為觸發重新計算的條件
+  useLayoutEffect(() => { measureTree(); }, [branches, viewMode]);
+
+  // 當切換到「產生報表(report)」時，強制在不同時間點連續計算，確保字體載入或排版變化後線條不斷掉
+  useEffect(() => {
+    if (viewMode === 'report') {
+      const t1 = setTimeout(() => measureTreeRef.current(), 100);
+      const t2 = setTimeout(() => measureTreeRef.current(), 500);
+      const t3 = setTimeout(() => measureTreeRef.current(), 1000);
+      return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+    }
+  }, [viewMode]);
 
   useEffect(() => {
     let debounceTimer = null; let gestureActive = false;
@@ -243,8 +279,7 @@ const ReportApp = ({ session }) => {
     const onTouchStart = (e) => { if (e.touches && e.touches.length > 1) gestureActive = true; };
     const onTouchEnd = () => { if (!gestureActive) return; gestureActive = false; clearTimeout(debounceTimer); debounceTimer = setTimeout(() => measureTreeRef.current(), 200); };
     window.addEventListener('touchstart', onTouchStart, { passive: true }); window.addEventListener('touchend', onTouchEnd, { passive: true }); window.addEventListener('touchcancel', onTouchEnd, { passive: true }); window.addEventListener('resize', debouncedMeasure);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => measureTreeRef.current());
-    const t = setTimeout(() => measureTreeRef.current(), 250);
+    
     let ro;
     if (window.ResizeObserver) {
       ro = new ResizeObserver(debouncedMeasure);
@@ -254,20 +289,22 @@ const ReportApp = ({ session }) => {
     }
     return () => {
       window.removeEventListener('touchstart', onTouchStart); window.removeEventListener('touchend', onTouchEnd); window.removeEventListener('touchcancel', onTouchEnd); window.removeEventListener('resize', debouncedMeasure);
-      clearTimeout(t); clearTimeout(debounceTimer); if (ro) ro.disconnect();
+      clearTimeout(debounceTimer); if (ro) ro.disconnect();
     };
-  }, [branches]);
+  }, [branches, viewMode]);
+
+  const generateId = (prefix = '') => `${prefix}${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
   // 資料操作
-  const addBranch = () => setBranches([...branches, { id: `b${Date.now()}`, amount: 0, t1: '', t2: '', t3: '', subBranches: [] }]);
+  const addBranch = () => setBranches([...branches, { id: generateId('b'), amount: 0, t1: '', t2: '', t3: '', subBranches: [] }]);
   const removeBranch = (id) => setBranches(branches.filter(b => b.id !== id));
   const updateBranch = (id, field, value) => setBranches(branches.map(b => b.id === id ? { ...b, [field]: value } : b));
-  const addSubBranch = (bId) => setBranches(branches.map(b => b.id === bId ? { ...b, subBranches: [...b.subBranches, { id: `s${Date.now()}`, amount: 0, t1: '', t2: '', note: '' }] } : b));
+  const addSubBranch = (bId) => setBranches(branches.map(b => b.id === bId ? { ...b, subBranches: [...b.subBranches, { id: generateId('s'), amount: 0, t1: '', t2: '', note: '' }] } : b));
   const removeSubBranch = (bId, sId) => setBranches(branches.map(b => b.id === bId ? { ...b, subBranches: b.subBranches.filter(s => s.id !== sId) } : b));
   const updateSubBranch = (bId, sId, field, value) => setBranches(branches.map(b => b.id === bId ? { ...b, subBranches: b.subBranches.map(s => s.id === sId ? { ...s, [field]: value } : s) } : b));
 
   const handleItemChange = (setter, items, id, field, value) => setter(items.map(item => item.id === id ? { ...item, [field]: value } : item));
-  const addItem = (setter, items) => setter([...items, { id: Date.now(), name: '', amount: 0, note: '' }]);
+  const addItem = (setter, items) => setter([...items, { id: generateId('item'), name: '', amount: 0, note: '' }]);
   const removeItem = (setter, items, id) => setter(items.filter(item => item.id !== id));
 
   const sum = (arr) => arr.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
@@ -358,50 +395,53 @@ const ReportApp = ({ session }) => {
     return () => clearTimeout(autoSaveTimer.current);
   }, [userName, advisorName, incomes, livingExps, savingExps, insuranceExps, assets, loans, branches, goals, futureEvents, blindSpots, advice, currentReportId]);
 
+  // ---- 修復點 2：優化圖片輸出，保證直接下載 & iOS友善長按存圖 ----
   const downloadRef = async (ref, setBusy, filename) => {
     if (!ref.current) return;
     setBusy(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 100));
-      const scale = window.innerWidth < 1024 ? 1.5 : 2;
+      // 稍微等待，確保介面完全穩定
+      await new Promise(resolve => setTimeout(resolve, 300));
+      const scale = window.innerWidth < 1024 ? 2 : 2.5; // 提高畫質
       const canvas = await html2canvas(ref.current, { scale: scale, useCORS: true, backgroundColor: '#ffffff' });
-      const fallbackDownload = (blob) => {
-        const url = window.URL.createObjectURL(blob); const link = document.createElement("a"); link.style.display = "none"; link.href = url; link.download = filename;
-        document.body.appendChild(link); link.click(); document.body.removeChild(link); setTimeout(() => window.URL.revokeObjectURL(url), 100);
-      };
+      
       canvas.toBlob(async (blob) => {
         if (!blob) { alert("圖片生成失敗！"); setBusy(false); return; }
-        const file = new File([blob], filename, { type: blob.type });
-        let shareSucceeded = false;
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          try { await navigator.share({ files: [file], title: filename }); shareSucceeded = true; } catch (err) { if (err.name === 'AbortError') shareSucceeded = true; }
-        }
-        if (!shareSucceeded) {
-          try { fallbackDownload(blob); } catch (e) { }
-          const reader = new FileReader();
-          reader.onload = () => setPreviewImage({ dataUrl: reader.result, filename });
-          reader.readAsDataURL(blob);
-        }
+        
+        // 動作1：強制網頁直接下載 (對電腦版與 Android 很有效)
+        const url = window.URL.createObjectURL(blob); 
+        const link = document.createElement("a"); 
+        link.style.display = "none"; 
+        link.href = url; 
+        link.download = filename;
+        document.body.appendChild(link); 
+        link.click(); 
+        document.body.removeChild(link); 
+        
+        // 動作2：同時把圖片轉成 Base64 顯示在畫面上，因為 iOS Safari 會阻擋直接存相簿
+        // 這樣 iOS 使用者就可以直接長按彈出來的畫面，選擇「儲存至照片」
+        const reader = new FileReader();
+        reader.onload = () => {
+          setPreviewImage({ dataUrl: reader.result, filename });
+          setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+        };
+        reader.readAsDataURL(blob);
+        
         setBusy(false);
       }, "image/png", 1.0);
-    } catch (error) { console.error("輸出圖片失敗:", error); alert("輸出圖片失敗，請再試一次。"); setBusy(false); }
+    } catch (error) { 
+      console.error("輸出圖片失敗:", error); 
+      alert("輸出圖片失敗，請再試一次。"); 
+      setBusy(false); 
+    }
   };
 
-  const handleDownloadImage = () => downloadRef(reportRef, setIsDownloading, `財務分配報表_${userName}.png`);
-  const handleDownloadImage2 = () => downloadRef(reportRef2, setIsDownloading2, `財務規劃紀錄_${userName}.png`);
+  const handleDownloadImage = () => downloadRef(reportRef, setIsDownloading, `財務分配報表_P1_${userName||'客戶'}.png`);
+  const handleDownloadImage2 = () => downloadRef(reportRef2, setIsDownloading2, `財務規劃紀錄_P2_${userName||'客戶'}.png`);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const isDownloadingAny = isDownloading || isDownloading2;
   const handleDownloadBoth = async () => { await handleDownloadImage(); await new Promise(r => setTimeout(r, 500)); await handleDownloadImage2(); };
 
-  const RenderList = ({ items, isSaving = false }) => (
-    <div className="flex flex-col gap-1.5 mt-3">{items.filter(item => Number(item.amount) > 0).map(item => (<div key={item.id} className="group flex items-center justify-between py-2.5 px-1 rounded-lg transition-colors" onMouseEnter={e=>e.currentTarget.style.background='var(--paper)'} onMouseLeave={e=>e.currentTarget.style.background='transparent'}><div className="flex items-center gap-2.5"><span className="font-bold text-[14.5px]" style={{color:'var(--ink)'}}>{item.name || '-'}</span>{item.note && (<span className="text-[11px] px-2.5 py-0.5 rounded-full font-bold" style={{background: isSaving ? 'var(--income-bg)' : 'var(--income-deep)' , color: isSaving ? 'var(--income-deep)' : 'var(--expense-deep)'}}>{item.note}</span>)}</div><span className="font-num font-extrabold text-[15.5px]" style={{color:'var(--ink)'}}>{Number(item.amount).toLocaleString()}</span></div>))}</div>
-  );
-
-  const InputGroup = ({ label, value, onChange, placeholder, type = "text" }) => (
-    <div className="flex flex-col gap-1"><label className="text-[10.5px] font-bold tracking-wider pl-1 uppercase" style={{color:'#a8a49a'}}>{label}</label>{type === "number" ? (<MoneyInput value={value} onChange={v => onChange({ target: { value: v } })} placeholder={placeholder} className="rounded-lg p-2.5 text-sm outline-none transition-colors" style={{background:'#f5f4ef', border:'1.5px solid #e7e5dd', color:'var(--ink)'}}/>) : (<input type={type} value={value} onChange={onChange} className="rounded-lg p-2.5 text-sm outline-none transition-colors" style={{background:'#f5f4ef', border:'1.5px solid #e7e5dd', color:'var(--ink)'}} onFocus={e => e.target.style.borderColor = '#5271e0'} onBlur={e => e.target.style.borderColor = '#e7e5dd'} placeholder={placeholder}/>)}</div>
-  );
-
-  // 用於全螢幕編輯模式的分類渲染
   const renderEditSection = (title, name, data, setter, tone, showNote) => (
     <div className="animate-[fadeIn_0.2s_ease-out]">
       <div className="flex justify-between items-center mb-5 pb-4" style={{borderBottom:'1px solid var(--line)'}}>
@@ -427,9 +467,7 @@ const ReportApp = ({ session }) => {
   return (
     <div className="min-h-screen flex flex-col xl:h-screen" style={{background:'var(--paper)'}}>
       
-      {/* =========================================================================
-          Header (確保 z-50 relative，下拉選單絕對不被蓋住)
-          ========================================================================= */}
+      {/* Header */}
       <div className="px-6 py-4 flex justify-between items-center print:hidden z-50 relative shrink-0" style={{background:'var(--card)', borderBottom:'1px solid var(--line)'}}>
         <div className="flex items-center gap-3.5">
           <a href="index.html" className="flex items-center justify-center w-10 h-10 rounded-full transition-colors hover:-translate-y-0.5" style={{background:'#f5f4ef', color:'var(--ink-soft)', border:'1.5px solid #e7e5dd'}} title="返回系統首頁">
@@ -477,7 +515,7 @@ const ReportApp = ({ session }) => {
 
           <button onClick={() => supabaseClient.auth.signOut()} className="px-4 py-3 rounded-full font-bold text-sm hidden sm:block" style={{background:'#f5f4ef', color:'var(--ink-soft)'}}>登出</button>
 
-          {/* ===== 雙頁面切換按鈕 ===== */}
+          {/* ===== 按鈕：編輯/預覽 切換與強化的下載選單 ===== */}
           {viewMode === 'edit' ? (
             <button onClick={() => setViewMode('report')} className="px-6 py-3 rounded-full font-bold transition-all text-sm tracking-wide flex items-center gap-2 text-white shadow-[0_4px_14px_rgba(82,113,224,0.35)] hover:shadow-[0_6px_20px_rgba(82,113,224,0.45)] hover:-translate-y-0.5" style={{background:'var(--assets)'}}>
               👉 產生報表
@@ -490,15 +528,15 @@ const ReportApp = ({ session }) => {
 
               <div className="relative">
                 <button onClick={() => setShowExportMenu(v => !v)} disabled={isDownloadingAny} className={`px-6 py-3 rounded-full font-bold transition-all text-sm tracking-wide flex items-center gap-2 text-white shadow-[0_4px_14px_rgba(82,113,224,0.35)] ${isDownloadingAny ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-[0_6px_20px_rgba(82,113,224,0.45)] hover:-translate-y-0.5'}`} style={{background:'var(--assets)'}}>
-                  {isDownloadingAny ? '⏳ 處理中...' : '⬇ 輸出報表'}
+                  {isDownloadingAny ? '⏳ 處理中...' : '⬇ 輸出報表圖檔'}
                 </button>
                 {showExportMenu && !isDownloadingAny && (
                   <>
                     <div className="fixed inset-0 z-30" onClick={() => setShowExportMenu(false)}></div>
                     <div className="absolute right-0 mt-2 w-56 rounded-2xl overflow-hidden z-40" style={{background:'var(--card)', boxShadow:'0 12px 32px rgba(34,37,43,0.16)', border:'1px solid var(--line)'}}>
-                      <button onClick={() => { setShowExportMenu(false); handleDownloadImage(); }} className="w-full text-left px-5 py-3.5 text-sm font-bold transition-colors hover:bg-black/[0.03]" style={{color:'var(--ink)'}}>只輸出第一頁<div className="text-[11px] font-medium mt-0.5" style={{color:'#a8a49a'}}>財務分配報表</div></button>
-                      <button onClick={() => { setShowExportMenu(false); handleDownloadImage2(); }} className="w-full text-left px-5 py-3.5 text-sm font-bold transition-colors hover:bg-black/[0.03]" style={{color:'var(--ink)', borderTop:'1px solid var(--line)'}}>只輸出第二頁<div className="text-[11px] font-medium mt-0.5" style={{color:'#a8a49a'}}>財務規劃紀錄</div></button>
-                      <button onClick={() => { setShowExportMenu(false); handleDownloadBoth(); }} className="w-full text-left px-5 py-3.5 text-sm font-bold transition-colors hover:bg-black/[0.03]" style={{color:'var(--assets-deep)', background:'var(--assets-bg)', borderTop:'1px solid var(--line)'}}>兩頁都輸出<div className="text-[11px] font-medium mt-0.5" style={{color:'var(--assets)'}}>下載兩張 PNG 圖片</div></button>
+                      <button onClick={() => { setShowExportMenu(false); handleDownloadImage(); }} className="w-full text-left px-5 py-3.5 text-sm font-bold transition-colors hover:bg-black/[0.03]" style={{color:'var(--ink)'}}>只輸出第一頁<div className="text-[11px] font-medium mt-0.5" style={{color:'#a8a49a'}}>財務分配報表 (Page 1)</div></button>
+                      <button onClick={() => { setShowExportMenu(false); handleDownloadImage2(); }} className="w-full text-left px-5 py-3.5 text-sm font-bold transition-colors hover:bg-black/[0.03]" style={{color:'var(--ink)', borderTop:'1px solid var(--line)'}}>只輸出第二頁<div className="text-[11px] font-medium mt-0.5" style={{color:'#a8a49a'}}>財務規劃紀錄 (Page 2)</div></button>
+                      <button onClick={() => { setShowExportMenu(false); handleDownloadBoth(); }} className="w-full text-left px-5 py-3.5 text-sm font-bold transition-colors hover:bg-black/[0.03]" style={{color:'var(--assets-deep)', background:'var(--assets-bg)', borderTop:'1px solid var(--line)'}}>兩頁連續輸出<div className="text-[11px] font-medium mt-0.5" style={{color:'var(--assets)'}}>連續下載兩張 PNG 圖片</div></button>
                     </div>
                   </>
                 )}
@@ -509,16 +547,11 @@ const ReportApp = ({ session }) => {
         </div>
       </div>
 
-      {/* =========================================================================
-          主內容區域 (根據 viewMode 切換編輯/預覽模式)
-          ========================================================================= */}
       <div className="flex-1 flex flex-col relative overflow-hidden">
         
         {viewMode === 'edit' ? (
-          /* ================== 第一頁：全螢幕編輯模式 ================== */
+          /* 第一頁：全螢幕編輯模式 */
           <div className="flex-1 flex flex-col items-center bg-[#f1efe8] overflow-y-auto custom-scrollbar pt-6">
-            
-            {/* 標籤列 (自動換行 flex-wrap，確保手機/平板一次全部顯示) */}
             <div className="w-full max-w-4xl px-4">
               <div className="w-full pb-4">
                 <div className="flex flex-wrap justify-center gap-2 md:gap-3">
@@ -531,7 +564,6 @@ const ReportApp = ({ session }) => {
               </div>
             </div>
 
-            {/* 輸入卡片區塊 */}
             <div className="w-full max-w-4xl px-4 pb-24 mt-2">
               <div className="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-gray-100" style={{boxShadow:'0 12px 32px rgba(34,37,43,0.06)'}}>
                 
@@ -629,10 +661,10 @@ const ReportApp = ({ session }) => {
             </div>
           </div>
         ) : (
-          /* ================== 第二頁：產出報表預覽模式 ================== */
+          /* 預覽模式 */
           <div className="flex-1 overflow-x-auto xl:overflow-y-auto p-4 md:p-8 xl:p-12 flex flex-col items-center gap-10 print:p-0 print:gap-0 custom-scrollbar z-10 relative bg-[#f1efe8]">
             
-            {/* 第一頁：財務分配報表 */}
+            {/* 第一頁 */}
             <div ref={reportRef} className="p-14 xl:p-20 rounded-[2.5rem] w-[1440px] min-w-[1200px] print:w-full print:min-w-0 print:shadow-none print:p-0 relative flex flex-col" style={{background:'var(--card)', boxShadow:'0 28px 64px rgba(34,37,43,0.18), 0 6px 16px rgba(34,37,43,0.10)'}}>
               <div className="absolute top-0 right-0 w-[620px] h-[620px] rounded-full glow-blob pointer-events-none" style={{background:'radial-gradient(circle, var(--income-bg) 0%, rgba(255,255,255,0) 68%)', transform:'translate(30%,-45%)'}}></div>
               <div className="absolute bottom-0 left-0 w-[520px] h-[520px] rounded-full glow-blob pointer-events-none" style={{background:'radial-gradient(circle, var(--assets-bg) 0%, rgba(255,255,255,0) 68%)', transform:'translate(-25%,30%)'}}></div>
@@ -685,7 +717,7 @@ const ReportApp = ({ session }) => {
               <div className="mt-20 pt-8 flex justify-between items-center w-full" style={{borderTop:'1.5px solid var(--line)'}}><div className="flex items-center gap-2.5 text-[13px] font-medium" style={{color:'var(--ink-soft)'}}><span className="w-1.5 h-1.5 rounded-full" style={{background:'var(--income)'}}></span>撿起散落的財務碎片，拼湊出夢想真實的形狀。</div><div className="px-5 py-2.5 rounded-full font-bold text-sm" style={{background:'var(--assets-bg)', color:'var(--assets-deep)'}}>專屬財務顧問 {advisorName}</div></div>
             </div>
 
-            {/* 第二頁：財務規劃紀錄 */}
+            {/* 第二頁 */}
             <div ref={reportRef2} className="page-break p-14 xl:p-20 rounded-[2.5rem] w-[1440px] min-w-[1200px] print:w-full print:min-w-0 print:shadow-none print:p-14 relative flex flex-col" style={{background:'var(--card)', boxShadow:'0 28px 64px rgba(34,37,43,0.18), 0 6px 16px rgba(34,37,43,0.10)'}}>
               <div className="absolute top-0 right-0 w-[560px] h-[560px] rounded-full glow-blob pointer-events-none" style={{background:'radial-gradient(circle, var(--income-bg) 0%, rgba(255,255,255,0) 68%)', transform:'translate(30%,-40%)'}}></div>
               <div className="absolute bottom-0 left-0 w-[520px] h-[520px] rounded-full glow-blob pointer-events-none" style={{background:'radial-gradient(circle, var(--assets-bg) 0%, rgba(255,255,255,0) 68%)', transform:'translate(-25%,35%)'}}></div>
@@ -706,19 +738,18 @@ const ReportApp = ({ session }) => {
 
       </div>
 
-      {/* 保底的長按存圖視窗 */}
+      {/* 彈出預覽視窗 (確保 iOS 使用者也能 100% 存圖) */}
       {previewImage && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-5" style={{background:'rgba(20,24,35,0.82)'}} onClick={() => setPreviewImage(null)}>
           <div className="w-full max-w-2xl mb-4 text-center" onClick={e => e.stopPropagation()}>
-            <p className="text-white font-bold text-base mb-1">📌 長按下方圖片，選擇「儲存到照片」或「加入照片」即可存檔</p>
-            <p className="text-white/60 text-sm">如果剛剛已經自動跳出分享或下載視窗，這裡可以直接關閉</p>
+            <p className="text-white font-bold text-base mb-1">📌 如果沒有自動下載，請長按下方圖片，選擇「儲存到照片」</p>
+            <p className="text-white/60 text-sm">此為手機版（特別是 iPhone）的保底存圖機制</p>
           </div>
           <div className="max-w-2xl w-full overflow-auto rounded-2xl" style={{maxHeight:'70vh', background:'#ffffff'}} onClick={e => e.stopPropagation()}>
             <img src={previewImage.dataUrl} alt={previewImage.filename} style={{width:'100%', display:'block'}} />
           </div>
           <div className="flex gap-3 mt-5" onClick={e => e.stopPropagation()}>
-            <a href={previewImage.dataUrl} download={previewImage.filename} className="px-6 py-3 rounded-full font-bold text-sm text-white" style={{background:'var(--assets)'}}>⬇ 再試一次自動下載</a>
-            <button onClick={() => setPreviewImage(null)} className="px-6 py-3 rounded-full font-bold text-sm" style={{background:'rgba(255,255,255,0.15)', color:'#ffffff'}}>關閉</button>
+            <button onClick={() => setPreviewImage(null)} className="px-6 py-3 rounded-full font-bold text-sm" style={{background:'rgba(255,255,255,0.2)', color:'#ffffff'}}>關閉視窗</button>
           </div>
         </div>
       )}
