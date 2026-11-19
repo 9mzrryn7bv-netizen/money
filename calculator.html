@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -126,14 +125,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .mb-note{font-size:.65rem;color:var(--txt2);margin-top:8px;line-height:1.5}
 
 /* ══ ACCT STRIP ══ */
-.acct-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:0;background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--sh);margin-bottom:16px}
+.acct-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--sh);margin-bottom:16px}
 .as-tile{padding:18px 14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border-right:1px solid var(--border);text-align:center;position:relative}
 .as-tile:last-child{border-right:none}
 .as-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;margin-bottom:3px}
 .as-label{font-size:.62rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.07em;line-height:1.3}
 .as-value{font-size:1.2rem;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1.1}
 .as-sub{font-size:.63rem;color:var(--txt3);margin-top:2px}
-.as-op{position:absolute;right:-11px;top:50%;transform:translateY(-50%);width:22px;height:22px;background:var(--bg3);border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.78rem;color:var(--txt2);font-weight:700;z-index:2}
 
 /* ══ VERDICT ══ */
 .verd{display:flex;align-items:center;gap:14px;padding:16px 20px;border-radius:13px;border:1.5px solid;margin-bottom:14px;transition:all .3s}
@@ -240,7 +238,6 @@ tfoot td{padding:9px 12px;font-size:.73rem;color:var(--txt3);font-style:italic;b
   .nav{padding:0 14px}
   .page{padding:14px}
   .acct-strip{grid-template-columns:repeat(2,1fr)}
-  .as-op{display:none}
   .mets{grid-template-columns:repeat(2,1fr)}
   .phases{grid-template-columns:1fr}
   .rg4{grid-template-columns:1fr 1fr}
@@ -323,7 +320,7 @@ tfoot td{padding:9px 12px;font-size:.73rem;color:var(--txt3);font-style:italic;b
       <div class="fg">
         <div class="fl2">貸款年利率</div>
         <div class="iw"><input type="number" id="mRate" value="2.2" min="0.1" max="20" step="0.05" oninput="calc()"><span class="sx">%</span></div>
-        <div class="hint">房貸參考：1.5–4%　信貸參考：3–12%</div>
+        <div class="hint">房貸參考：1.5–4% 信貸參考：3–12%</div>
       </div>
       <div class="fg">
         <div class="fl2">貸款年期</div>
@@ -533,35 +530,24 @@ tfoot td{padding:9px 12px;font-size:.73rem;color:var(--txt3);font-style:italic;b
       <div class="as-label">貸款金額</div>
       <div class="as-value vb" id="fv-loan">—</div>
       <div class="as-sub">期初貸款本金</div>
-      <div class="as-op">=</div>
     </div>
     <div class="as-tile">
       <div class="as-icon" style="background:var(--gdim);color:var(--green)">市</div>
       <div class="as-label">投資市值</div>
       <div class="as-value vg" id="fv-mkt">—</div>
       <div class="as-sub" id="fv-mkt-sub">扣費後總投入</div>
-      <div class="as-op">−</div>
     </div>
     <div class="as-tile">
       <div class="as-icon" style="background:var(--bdim);color:var(--blue)">貸</div>
       <div class="as-label">貸款餘額</div>
       <div class="as-value vr" id="fv-net">—</div>
       <div class="as-sub" id="fv-net-sub">期初本金</div>
-      <div class="as-op">=</div>
     </div>
     <div class="as-tile">
       <div class="as-icon" style="background:var(--goldim);color:var(--gold)">備</div>
       <div class="as-label">預留備用金</div>
       <div class="as-value vgold" id="fv-res">—</div>
       <div class="as-sub">活存或定存</div>
-      <div class="as-op" id="as-op-net">=</div>
-    </div>
-    <div class="as-tile">
-      <div class="as-icon" style="background:var(--gdim);color:var(--green)">淨</div>
-      <div class="as-label">帳面淨資產</div>
-      <div class="as-value" id="fv-netasset">—</div>
-      <div class="as-sub">市值 − 貸款</div>
-      <div class="as-op" id="as-op-margin" style="display:none">|</div>
     </div>
     <div class="as-tile" id="as-tile-margin" style="display:none">
       <div class="as-icon" style="background:var(--rdim);color:var(--red)">撐</div>
@@ -677,13 +663,13 @@ tfoot td{padding:9px 12px;font-size:.73rem;color:var(--txt3);font-style:italic;b
         <thead>
           <tr>
             <th style="text-align:left;min-width:70px">年份</th>
-            <th>月還款</th><th>月配息</th><th>再投入</th><th>可動用</th>
+            <th>月配息</th><th>− 月還款</th><th>− 再投入</th><th>= 可動用</th>
             <th>年還款</th><th>年淨損益</th><th>累積損益</th>
-            <th>投資市值</th><th>貸款餘額</th><th>帳面淨資產</th>
+            <th>投資市值</th><th>貸款餘額</th><th id="th-prep-prin" style="display:none">已準備還款本金</th>
           </tr>
         </thead>
         <tbody id="tbl-body"></tbody>
-        <tfoot><tr><td colspan="11" id="tbl-note">—</td></tr></tfoot>
+        <tfoot><tr><td colspan="10" id="tbl-note">—</td></tr></tfoot>
       </table>
     </div>
   </div>
@@ -855,43 +841,38 @@ function calc(){
   const coverStr=coverMo===Infinity?'∞':coverMo+' 個月';
   set('rb-cov',coverMo===Infinity?'不需動用備用金':'備用可撐 '+coverStr);
 
-  /* 帳戶概覽（重新定義：市值 = 扣費後總投入，貸款餘額 = 期初貸款，淨資產 = 市值 - 貸款）*/
-  const mktValue=totalInvested, netAsset=mktValue-LA;
+  /* 帳戶概覽 */
+  const mktValue=totalInvested;
   set('fv-loan',fmtW(LA));
   set('fv-mkt',fmtW(mktValue),'var(--green)');
   set('fv-mkt-sub','扣費後總投入'+(LEV>0?' (含槓桿)':''));
-  set('fv-net',fmtW(LA),'var(--red)');  // 貸款餘額
+  set('fv-net',fmtW(LA),'var(--red)');
   set('fv-net-sub','期初本金');
   set('fv-res',fmtW(reserveAmt));
-  set('fv-netasset',(netAsset>=0?'+':'')+fmtW(netAsset),netAsset>=0?'var(--green)':'var(--red)');
-  // 動態調整 acct-strip 欄數（有維持率第6格時）
 
   /* sustain */
-  const marginTile=el('as-tile-margin'),marginOp=el('as-op-margin');
+  const marginTile=el('as-tile-margin');
   if(NC>0&&leverageAmt>0){
-    marginTile.style.display='';marginOp.style.display='';
+    marginTile.style.display='';
     let mbal=totalInvested,sYrs=0;
     for(let y=1;y<=50;y++){mbal*=(1-NC/100);if(calcMarginRatio(mbal,leverageAmt)>=130)sYrs=y;else break;if(y===50){sYrs=50;break;}}
     set('fv-sustain',sYrs===0?'已低於警示線':sYrs===50?'50年以上':sYrs+' 年',sYrs===0?'var(--red)':sYrs>=10?'var(--green)':'var(--orange)');
-    el('acct-strip-box').style.gridTemplateColumns='repeat(6,1fr)';
-  }else{marginTile.style.display='none';marginOp.style.display='none';el('acct-strip-box').style.gridTemplateColumns='repeat(5,1fr)';}
+    el('acct-strip-box').style.gridTemplateColumns='repeat(5,1fr)';
+  }else{marginTile.style.display='none';el('acct-strip-box').style.gridTemplateColumns='repeat(4,1fr)';}
 
   renderMarginBox(totalInvested,leverageAmt,NC);
 
-  /* 套利核心數字（以正確公式） */
-  // 寬限期/科目一：可動用 = 配息 - 再投入 - 利息（不還本金）
-  // 還款期/科目四：可動用 = 配息 - 再投入 - 利息 - 本金 = 配息 - 再投入 - fullPay
+  /* 套利核心數字 */
   const monthlyFreeGrace = monthlyDiv - monthlyReinvest - grPay;
-  const monthlyFreeRepay = monthlyDiv - monthlyReinvest - fullPay; // = monthlyFree
+  const monthlyFreeRepay = monthlyDiv - monthlyReinvest - fullPay;
   const yearlyArb = monthlyFreeRepay * 12;
 
-  // 損益平衡殖利率（配息需覆蓋：再投入 + 全額月還款）
   const beYield = totalInvested > 0
     ? (fullPay / (1 - RI/100)) * 12 / totalInvested * 100
     : 0;
   const gap = DR - beYield;
 
-  /* flow strip（完整公式：配息 − 再投入 − 利息 − 本金 ＝ 月可動用）*/
+  /* flow strip */
   set('fv-inv',  LEV>0 ? fmtW(investedAmt)+'＋'+fmtW(leverageAmt) : fmtW(investedAmt));
   set('fv-div',  fmt(monthlyDiv)+' 元');
   set('fv-ri',   RI>0 ? fmt(monthlyReinvest)+' 元' : '— 元');
@@ -904,24 +885,21 @@ function calc(){
 
   /* 利息 / 本金拆解 */
   const mr_normal = loanMode==='normal' ? MR/100/12 : 0;
-  // 理財型：利息 = 科目四月繳（fullPay），本金 = 總貸款 ÷ 總月數（應計，不需實繳但計入可動用）
   const finMonthlyPrincipal = loanMode==='financial' ? LA / n : 0;
   const dispInterest  = loanMode==='financial' ? fullPay : LA * mr_normal;
   const dispPrincipal = loanMode==='financial' ? finMonthlyPrincipal : Math.max(0, fullPay - dispInterest);
   set('fv-interest',  fmt(dispInterest)+' 元');
   set('fv-principal', fmt(dispPrincipal)+' 元'+(loanMode==='financial' ? '（應計）' : ''));
 
-  // 理財型月可動用也納入應計本金
   const monthlyFreeAdj = loanMode==='financial'
     ? monthlyDiv - monthlyReinvest - fullPay - finMonthlyPrincipal
     : monthlyFreeRepay;
 
-  // 更新 flow strip 可動用顯示
   set('fv-free', ss(monthlyFreeAdj)+' 元', monthlyFreeAdj>=0 ? 'var(--green)' : 'var(--red)');
   fnb.className = monthlyFreeAdj>=0 ? 'fs fs-net' : 'fs fs-net is-red';
   el('fi-net').style.background = monthlyFreeAdj>=0 ? 'rgba(0,138,94,.15)' : 'rgba(212,43,43,.15)';
   el('fi-net').style.color      = monthlyFreeAdj>=0 ? 'var(--green)' : 'var(--red)';
-  // 更新 metrics
+
   const finalMonthlyFree = loanMode==='financial' ? monthlyFreeAdj : monthlyFreeRepay;
   set('m-net', ss(finalMonthlyFree)+' 元', finalMonthlyFree>=0 ? 'var(--green)' : 'var(--red)');
   set('m-ya',  ss(finalMonthlyFree*12)+' 元', finalMonthlyFree>=0 ? 'var(--green)' : 'var(--red)');
@@ -973,6 +951,8 @@ function buildTable(LA,mr,n,grN,repN,grPay,fullPay,monthlyLevCost,LEV,RI,DR,tota
   const tbody=el('tbl-body');tbody.innerHTML='';
   let loanBal=LA,invBal=totalInvested0,cumNet=0,totPay=0,totNet=0;
   const riRate=RI/100,annRate=DR/100,isFin=(loanModeArg==='financial');
+  el('th-prep-prin').style.display = isFin ? '' : 'none';
+  el('tbl-note').colSpan = isFin ? 11 : 10;
   for(let yr=1;yr<=n/12;yr++){
     const ms=(yr-1)*12+1,me=yr*12;
     let annPay=0,annDiv=0,annRi=0,annFree=0;
@@ -984,12 +964,13 @@ function buildTable(LA,mr,n,grN,repN,grPay,fullPay,monthlyLevCost,LEV,RI,DR,tota
       annPay += curPay;
       const md=invBal*annRate/12-monthlyLevCost; annDiv+=md;
       const ri=Math.max(0,md)*riRate; annRi+=ri;
-      annFree += md - ri - curPay; // 月可動用 = 配息 - 再投入 - 還款（利息+本金）
+      annFree += md - ri - curPay;
       invBal+=ri;
     }
-    const annNet=annFree; // 年淨可動用 = Σ(配息-再投入-還款)
+    const annNet=annFree;
     cumNet+=annNet;totPay+=annPay;totNet+=annNet;
-    const avgDiv=annDiv/12,avgRi=annRi/12,avgFree=annFree/12,naYr=invBal-loanBal;
+    const avgDiv=annDiv/12,avgRi=annRi/12,avgFree=annFree/12;
+    const prepPrinTd = isFin ? `<td class="vb" style="font-weight:700">${fmtW((LA / n) * me)}</td>` : '';
     let rc='',tag='',mpd='';
     if(gm===12){rc='tr-grace';tag='<span class="tag-sm tg-grace">寬限</span>';mpd=fmt(grPay)+' 元';}
     else if(rm===12){tag='<span class="tag-sm tg-repay">還款</span>';mpd=fmt(fullPay)+' 元';}
@@ -998,27 +979,28 @@ function buildTable(LA,mr,n,grN,repN,grPay,fullPay,monthlyLevCost,LEV,RI,DR,tota
     else if(avgFree<0&&rc!=='tr-grace')rc='tr-loss';
     tbody.insertAdjacentHTML('beforeend',`<tr class="${rc}">
       <td>第 ${yr} 年${tag}</td>
-      <td>${mpd}</td>
       <td class="tnum-g">${fmt(avgDiv)} 元</td>
-      <td class="${RI>0?'tnum-g':'tnum-dim'}">${RI>0?'+'+fmt(avgRi)+' 元':'—'}</td>
+      <td>${mpd}</td>
+      <td class="${RI>0?'tnum-g':'tnum-dim'}">${RI>0?fmt(avgRi)+' 元':'—'}</td>
       <td class="${avgFree>=0?'tnum-g':'tnum-r'}">${ss(Math.round(avgFree))} 元</td>
       <td class="tnum-dim">${fmt(annPay)} 元</td>
       <td class="${annNet>=0?'tnum-g':'tnum-r'}">${ss(annNet)} 元</td>
       <td class="${cumNet>=0?'tnum-g':'tnum-r'}">${ss(cumNet)} 元</td>
       <td class="tnum-g">${fmtW(invBal)}</td>
       <td>${loanBal<1?'<span class="tnum-g">已還清</span>':(isFin&&yr===n/12?'<span class="tnum-r">'+fmtW(loanBal)+' ★到期還</span>':'<span class="tnum-dim">'+fmtW(loanBal)+'</span>')}</td>
-      <td class="${naYr>=0?'tnum-g':'tnum-r'}">${fmtW(naYr)}</td>
+      ${prepPrinTd}
     </tr>`);
   }
+  const totPrepPrinTd = isFin ? `<td class="vb">${fmtW(LA)}</td>` : '';
   tbody.insertAdjacentHTML('beforeend',`<tr class="tr-total">
     <td>合計</td><td>—</td><td>—</td><td>—</td><td>—</td>
     <td class="tnum-r">${fmt(totPay)} 元</td>
     <td class="${totNet>=0?'tnum-g':'tnum-r'}">${ss(totNet)} 元</td>
     <td class="${cumNet>=0?'tnum-g':'tnum-r'}">${ss(cumNet)} 元</td>
     <td class="tnum-g">${fmtW(invBal)}</td><td>—</td>
-    <td class="${(invBal-loanBal)>=0?'tnum-g':'tnum-r'}">${fmtW(invBal-loanBal)}</td>
+    ${totPrepPrinTd}
   </tr>`);
-  set('tbl-note',['月可動用 = 月配息 − 再投入 − 月還款（利息+本金）。',RI>0?`每月 ${RI}% 配息再投入複利成長。`:'',grN>0?'寬限期只扣利息，不扣本金。':'',LEV>0?'月淨配息已扣除槓桿月成本。':'',loanMode==='financial'?'理財型全程只扣利息，到期一次還本。':''].filter(Boolean).join('　'));
+  set('tbl-note',['月可動用 = 月配息 − 月還款（利息+本金） − 再投入。',RI>0?`每月 ${RI}% 配息再投入複利成長。`:'',grN>0?'寬限期只扣利息，不扣本金。':'',LEV>0?'月淨配息已扣除槓桿月成本。':'',isFin?'理財型全程只扣利息，已準備還款本金為按月攤提之累計金額。':''].filter(Boolean).join(' '));
 }
 
 function buildStrats(MR,DR,LR,be,LA,IA,grN,GR,netFull,cover,TM,isP,gap,resv,inv,fp,gp,leverageAmt,levSpread,LEV){
