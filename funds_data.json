@@ -1,0 +1,1420 @@
+{
+  "updated_at": "2026-11-20",
+  "funds": {
+    "JFP11": {
+      "name": "摩根多重收益 (穩定月配)",
+      "years": [
+        {
+          "yr": 2009,
+          "navChg": 16.37,
+          "divYield": 2.41
+        },
+        {
+          "yr": 2010,
+          "navChg": 8.98,
+          "divYield": 2.01
+        },
+        {
+          "yr": 2011,
+          "navChg": -1.27,
+          "divYield": 2.38
+        },
+        {
+          "yr": 2012,
+          "navChg": 9.09,
+          "divYield": 2.27
+        },
+        {
+          "yr": 2013,
+          "navChg": 13.34,
+          "divYield": 2.18
+        },
+        {
+          "yr": 2014,
+          "navChg": 4.21,
+          "divYield": 2.2
+        },
+        {
+          "yr": 2015,
+          "navChg": -3.09,
+          "divYield": 2.05
+        },
+        {
+          "yr": 2016,
+          "navChg": 4.37,
+          "divYield": 1.87
+        },
+        {
+          "yr": 2017,
+          "navChg": 10.69,
+          "divYield": 4.99
+        },
+        {
+          "yr": 2018,
+          "navChg": -8.04,
+          "divYield": 2.29
+        },
+        {
+          "yr": 2019,
+          "navChg": 15.81,
+          "divYield": 2.97
+        },
+        {
+          "yr": 2020,
+          "navChg": 9.11,
+          "divYield": 2.06
+        },
+        {
+          "yr": 2021,
+          "navChg": 9.35,
+          "divYield": 1.79
+        },
+        {
+          "yr": 2022,
+          "navChg": -17.38,
+          "divYield": 1.75
+        },
+        {
+          "yr": 2023,
+          "navChg": 12.79,
+          "divYield": 2.82
+        },
+        {
+          "yr": 2024,
+          "navChg": 7.76,
+          "divYield": 2.86
+        },
+        {
+          "yr": 2025,
+          "navChg": 13.42,
+          "divYield": 2.89
+        },
+        {
+          "yr": 2026,
+          "navChg": 1.31,
+          "divYield": 1.76
+        }
+      ]
+    },
+    "MLE24": {
+      "name": "貝萊德世界科技 (A10月配)",
+      "years": [
+        {
+          "yr": 1999,
+          "navChg": 65.13,
+          "divYield": 8.5
+        },
+        {
+          "yr": 2000,
+          "navChg": -41.88,
+          "divYield": 8.5
+        },
+        {
+          "yr": 2001,
+          "navChg": -23.35,
+          "divYield": 8.5
+        },
+        {
+          "yr": 2002,
+          "navChg": -38.33,
+          "divYield": 8.5
+        },
+        {
+          "yr": 2003,
+          "navChg": 37.7,
+          "divYield": 8.5
+        },
+        {
+          "yr": 2004,
+          "navChg": 3.58,
+          "divYield": 2.05
+        },
+        {
+          "yr": 2005,
+          "navChg": -0.99,
+          "divYield": 8.5
+        },
+        {
+          "yr": 2006,
+          "navChg": 11.29,
+          "divYield": 8.5
+        },
+        {
+          "yr": 2007,
+          "navChg": 14.62,
+          "divYield": 8.5
+        },
+        {
+          "yr": 2008,
+          "navChg": -42.2,
+          "divYield": 8.5
+        },
+        {
+          "yr": 2009,
+          "navChg": 48.8,
+          "divYield": 2.04
+        },
+        {
+          "yr": 2010,
+          "navChg": 9.86,
+          "divYield": 8.5
+        },
+        {
+          "yr": 2011,
+          "navChg": 1.03,
+          "divYield": 1.53
+        },
+        {
+          "yr": 2012,
+          "navChg": 13.36,
+          "divYield": 1.98
+        },
+        {
+          "yr": 2013,
+          "navChg": 23.88,
+          "divYield": 2.11
+        },
+        {
+          "yr": 2014,
+          "navChg": 15.7,
+          "divYield": 2.02
+        },
+        {
+          "yr": 2015,
+          "navChg": 3.58,
+          "divYield": 1.85
+        },
+        {
+          "yr": 2016,
+          "navChg": 12.91,
+          "divYield": 1.97
+        },
+        {
+          "yr": 2017,
+          "navChg": 32.24,
+          "divYield": 1.81
+        },
+        {
+          "yr": 2018,
+          "navChg": -3.08,
+          "divYield": 1.55
+        },
+        {
+          "yr": 2019,
+          "navChg": 47.9,
+          "divYield": 1.71
+        },
+        {
+          "yr": 2020,
+          "navChg": 41.83,
+          "divYield": 8.5
+        },
+        {
+          "yr": 2021,
+          "navChg": 33.73,
+          "divYield": 8.5
+        },
+        {
+          "yr": 2022,
+          "navChg": -28.43,
+          "divYield": 8.5
+        },
+        {
+          "yr": 2023,
+          "navChg": 54.68,
+          "divYield": 8.5
+        },
+        {
+          "yr": 2024,
+          "navChg": 20.8,
+          "divYield": 8.5
+        },
+        {
+          "yr": 2025,
+          "navChg": 23.83,
+          "divYield": 8.5
+        },
+        {
+          "yr": 2026,
+          "navChg": 11.61,
+          "divYield": 8.5
+        }
+      ]
+    },
+    "NGB1": {
+      "name": "高盛環球非投資等級債 (月配)",
+      "years": [
+        {
+          "yr": 2008,
+          "navChg": -24.53,
+          "divYield": 7.61
+        },
+        {
+          "yr": 2009,
+          "navChg": 15.56,
+          "divYield": 10.96
+        },
+        {
+          "yr": 2010,
+          "navChg": 2.79,
+          "divYield": 8.48
+        },
+        {
+          "yr": 2011,
+          "navChg": -0.95,
+          "divYield": 7.44
+        },
+        {
+          "yr": 2012,
+          "navChg": 4.38,
+          "divYield": 6.32
+        },
+        {
+          "yr": 2013,
+          "navChg": -0.5,
+          "divYield": 6.07
+        },
+        {
+          "yr": 2014,
+          "navChg": -3.53,
+          "divYield": 5.49
+        },
+        {
+          "yr": 2015,
+          "navChg": -10.07,
+          "divYield": 5.31
+        },
+        {
+          "yr": 2016,
+          "navChg": 7.41,
+          "divYield": 5.66
+        },
+        {
+          "yr": 2017,
+          "navChg": 0.82,
+          "divYield": 5.16
+        },
+        {
+          "yr": 2018,
+          "navChg": -7.06,
+          "divYield": 5.15
+        },
+        {
+          "yr": 2019,
+          "navChg": 8.43,
+          "divYield": 5.42
+        },
+        {
+          "yr": 2020,
+          "navChg": -0.73,
+          "divYield": 4.85
+        },
+        {
+          "yr": 2021,
+          "navChg": -0.33,
+          "divYield": 4.01
+        },
+        {
+          "yr": 2022,
+          "navChg": -15.38,
+          "divYield": 4.49
+        },
+        {
+          "yr": 2023,
+          "navChg": 5.11,
+          "divYield": 6.04
+        },
+        {
+          "yr": 2024,
+          "navChg": 1.63,
+          "divYield": 6.1
+        },
+        {
+          "yr": 2025,
+          "navChg": 2.52,
+          "divYield": 5.86
+        },
+        {
+          "yr": 2026,
+          "navChg": -5.08,
+          "divYield": 4.88
+        }
+      ]
+    },
+    "NGB2": {
+      "name": "高盛新興市場債 (月配)",
+      "years": [
+        {
+          "yr": 2008,
+          "navChg": -7.47,
+          "divYield": 5.21
+        },
+        {
+          "yr": 2009,
+          "navChg": 8.53,
+          "divYield": 6.11
+        },
+        {
+          "yr": 2010,
+          "navChg": 5.21,
+          "divYield": 5.42
+        },
+        {
+          "yr": 2011,
+          "navChg": 2.49,
+          "divYield": 4.95
+        },
+        {
+          "yr": 2012,
+          "navChg": 11.88,
+          "divYield": 4.29
+        },
+        {
+          "yr": 2013,
+          "navChg": -11.91,
+          "divYield": 4.19
+        },
+        {
+          "yr": 2014,
+          "navChg": 1.43,
+          "divYield": 4.62
+        },
+        {
+          "yr": 2015,
+          "navChg": -3.58,
+          "divYield": 4.67
+        },
+        {
+          "yr": 2016,
+          "navChg": 4.2,
+          "divYield": 5.03
+        },
+        {
+          "yr": 2017,
+          "navChg": 5.33,
+          "divYield": 4.78
+        },
+        {
+          "yr": 2018,
+          "navChg": -10.5,
+          "divYield": 5.05
+        },
+        {
+          "yr": 2019,
+          "navChg": 10.25,
+          "divYield": 4.98
+        },
+        {
+          "yr": 2020,
+          "navChg": 1.18,
+          "divYield": 3.93
+        },
+        {
+          "yr": 2021,
+          "navChg": -5.91,
+          "divYield": 3.66
+        },
+        {
+          "yr": 2022,
+          "navChg": -22.44,
+          "divYield": 3.91
+        },
+        {
+          "yr": 2023,
+          "navChg": 5.28,
+          "divYield": 4.99
+        },
+        {
+          "yr": 2024,
+          "navChg": -0.02,
+          "divYield": 5.46
+        },
+        {
+          "yr": 2025,
+          "navChg": 8.13,
+          "divYield": 5.38
+        },
+        {
+          "yr": 2026,
+          "navChg": -6.19,
+          "divYield": 4.33
+        }
+      ]
+    },
+    "AIG01": {
+      "name": "安聯收益成長 (AM穩定月收)",
+      "years": [
+        {
+          "yr": 2021,
+          "navChg": 13.35,
+          "divYield": 7.47
+        },
+        {
+          "yr": 2022,
+          "navChg": -13.77,
+          "divYield": 10.07
+        },
+        {
+          "yr": 2023,
+          "navChg": 0.9,
+          "divYield": 8.47
+        },
+        {
+          "yr": 2024,
+          "navChg": 4.64,
+          "divYield": 7.67
+        },
+        {
+          "yr": 2025,
+          "navChg": -0.5,
+          "divYield": 8.21
+        },
+        {
+          "yr": 2026,
+          "navChg": NaN,
+          "divYield": 6.58
+        }
+      ]
+    },
+    "ABH01": {
+      "name": "聯博全球非投資等級債 (AA月配)",
+      "years": [
+        {
+          "yr": 2008,
+          "navChg": -32.34,
+          "divYield": 8.72
+        },
+        {
+          "yr": 2009,
+          "navChg": 19.82,
+          "divYield": 14.56
+        },
+        {
+          "yr": 2010,
+          "navChg": 2.32,
+          "divYield": 11.15
+        },
+        {
+          "yr": 2011,
+          "navChg": -3.17,
+          "divYield": 8.13
+        },
+        {
+          "yr": 2012,
+          "navChg": 5.88,
+          "divYield": 6.57
+        },
+        {
+          "yr": 2013,
+          "navChg": -0.37,
+          "divYield": 6.02
+        },
+        {
+          "yr": 2014,
+          "navChg": -4.81,
+          "divYield": 5.71
+        },
+        {
+          "yr": 2015,
+          "navChg": -12.17,
+          "divYield": 5.79
+        },
+        {
+          "yr": 2016,
+          "navChg": 7.49,
+          "divYield": 7.05
+        },
+        {
+          "yr": 2017,
+          "navChg": 0.74,
+          "divYield": 5.64
+        },
+        {
+          "yr": 2018,
+          "navChg": -8.52,
+          "divYield": 5.4
+        },
+        {
+          "yr": 2019,
+          "navChg": 8.7,
+          "divYield": 5.91
+        },
+        {
+          "yr": 2020,
+          "navChg": -0.55,
+          "divYield": 5.09
+        },
+        {
+          "yr": 2021,
+          "navChg": -0.34,
+          "divYield": 4.25
+        },
+        {
+          "yr": 2022,
+          "navChg": -17.1,
+          "divYield": 5.03
+        },
+        {
+          "yr": 2023,
+          "navChg": 5.26,
+          "divYield": 6.72
+        },
+        {
+          "yr": 2024,
+          "navChg": 0.78,
+          "divYield": 6.68
+        },
+        {
+          "yr": 2025,
+          "navChg": 1.82,
+          "divYield": 6.66
+        },
+        {
+          "yr": 2026,
+          "navChg": -5.51,
+          "divYield": 5.48
+        }
+      ]
+    },
+    "ABA01": {
+      "name": "聯博美國收益 (AA月配)",
+      "years": [
+        {
+          "yr": 2004,
+          "navChg": 0.24,
+          "divYield": 3.46
+        },
+        {
+          "yr": 2005,
+          "navChg": -1.77,
+          "divYield": 3.99
+        },
+        {
+          "yr": 2006,
+          "navChg": -0.88,
+          "divYield": 4.65
+        },
+        {
+          "yr": 2007,
+          "navChg": 1.47,
+          "divYield": 4.93
+        },
+        {
+          "yr": 2008,
+          "navChg": 2.99,
+          "divYield": 4.63
+        },
+        {
+          "yr": 2009,
+          "navChg": -0.97,
+          "divYield": 3.85
+        },
+        {
+          "yr": 2010,
+          "navChg": 2.48,
+          "divYield": 3.83
+        },
+        {
+          "yr": 2011,
+          "navChg": 4.26,
+          "divYield": 3.3
+        },
+        {
+          "yr": 2012,
+          "navChg": 0.75,
+          "divYield": 2.97
+        },
+        {
+          "yr": 2013,
+          "navChg": -4.19,
+          "divYield": 2.23
+        },
+        {
+          "yr": 2014,
+          "navChg": 3.47,
+          "divYield": 2.48
+        },
+        {
+          "yr": 2015,
+          "navChg": -1.92,
+          "divYield": 2.4
+        },
+        {
+          "yr": 2016,
+          "navChg": 0.05,
+          "divYield": 2.4
+        },
+        {
+          "yr": 2017,
+          "navChg": 1.18,
+          "divYield": 2.35
+        },
+        {
+          "yr": 2018,
+          "navChg": -2.6,
+          "divYield": 2.88
+        },
+        {
+          "yr": 2019,
+          "navChg": 5.52,
+          "divYield": 2.85
+        },
+        {
+          "yr": 2020,
+          "navChg": 5.18,
+          "divYield": 2.25
+        },
+        {
+          "yr": 2021,
+          "navChg": -3.48,
+          "divYield": 1.71
+        },
+        {
+          "yr": 2022,
+          "navChg": -14.98,
+          "divYield": 2.03
+        },
+        {
+          "yr": 2023,
+          "navChg": 2.33,
+          "divYield": 3.2
+        },
+        {
+          "yr": 2024,
+          "navChg": -2.37,
+          "divYield": 3.66
+        },
+        {
+          "yr": 2025,
+          "navChg": 3.08,
+          "divYield": 4.01
+        },
+        {
+          "yr": 2026,
+          "navChg": -4.33,
+          "divYield": 3.32
+        }
+      ]
+    },
+    "PIM01": {
+      "name": "PIMCO 多元收益債 (月配)",
+      "years": [
+        {
+          "yr": 2013,
+          "navChg": -3.95,
+          "divYield": 2.71
+        },
+        {
+          "yr": 2014,
+          "navChg": 2.36,
+          "divYield": 4.22
+        },
+        {
+          "yr": 2015,
+          "navChg": -2.79,
+          "divYield": 3.81
+        },
+        {
+          "yr": 2016,
+          "navChg": -0.09,
+          "divYield": 2.85
+        },
+        {
+          "yr": 2017,
+          "navChg": 1.8,
+          "divYield": 2.92
+        },
+        {
+          "yr": 2018,
+          "navChg": -3.05,
+          "divYield": 3.36
+        },
+        {
+          "yr": 2019,
+          "navChg": 4.9,
+          "divYield": 3.54
+        },
+        {
+          "yr": 2020,
+          "navChg": 4.92,
+          "divYield": 2.79
+        },
+        {
+          "yr": 2021,
+          "navChg": -3.27,
+          "divYield": 2.49
+        },
+        {
+          "yr": 2022,
+          "navChg": -17.3,
+          "divYield": 2.84
+        },
+        {
+          "yr": 2023,
+          "navChg": 2.18,
+          "divYield": 4.14
+        },
+        {
+          "yr": 2024,
+          "navChg": -2.2,
+          "divYield": 4.91
+        },
+        {
+          "yr": 2025,
+          "navChg": 2.94,
+          "divYield": 5.26
+        },
+        {
+          "yr": 2026,
+          "navChg": NaN,
+          "divYield": 4.22
+        }
+      ]
+    },
+    "FID01": {
+      "name": "富達全球優質債券 (月配)",
+      "years": [
+        {
+          "yr": 2003,
+          "navChg": 0.8,
+          "divYield": 7.98
+        },
+        {
+          "yr": 2004,
+          "navChg": 0.87,
+          "divYield": 4.7
+        },
+        {
+          "yr": 2005,
+          "navChg": -3.44,
+          "divYield": 4.6
+        },
+        {
+          "yr": 2006,
+          "navChg": -0.94,
+          "divYield": 4.99
+        },
+        {
+          "yr": 2007,
+          "navChg": -1.72,
+          "divYield": 5.35
+        },
+        {
+          "yr": 2008,
+          "navChg": -3.04,
+          "divYield": 5.21
+        },
+        {
+          "yr": 2009,
+          "navChg": 2.46,
+          "divYield": 5.63
+        },
+        {
+          "yr": 2010,
+          "navChg": 4.12,
+          "divYield": 5.07
+        },
+        {
+          "yr": 2011,
+          "navChg": 4.91,
+          "divYield": 4.61
+        },
+        {
+          "yr": 2012,
+          "navChg": 6.36,
+          "divYield": 3.74
+        },
+        {
+          "yr": 2013,
+          "navChg": -5.62,
+          "divYield": 3.62
+        },
+        {
+          "yr": 2014,
+          "navChg": 4.57,
+          "divYield": 3.55
+        },
+        {
+          "yr": 2015,
+          "navChg": -4.52,
+          "divYield": 3.32
+        },
+        {
+          "yr": 2016,
+          "navChg": 2.78,
+          "divYield": 3.43
+        },
+        {
+          "yr": 2017,
+          "navChg": 3.74,
+          "divYield": 3.22
+        },
+        {
+          "yr": 2018,
+          "navChg": -7.19,
+          "divYield": 3.4
+        },
+        {
+          "yr": 2019,
+          "navChg": 13.42,
+          "divYield": 3.73
+        },
+        {
+          "yr": 2020,
+          "navChg": 7.95,
+          "divYield": 2.87
+        },
+        {
+          "yr": 2021,
+          "navChg": -4.06,
+          "divYield": 2.2
+        },
+        {
+          "yr": 2022,
+          "navChg": -20.44,
+          "divYield": 2.63
+        },
+        {
+          "yr": 2023,
+          "navChg": 4.96,
+          "divYield": 4.19
+        },
+        {
+          "yr": 2024,
+          "navChg": -3.45,
+          "divYield": 4.29
+        },
+        {
+          "yr": 2025,
+          "navChg": 3.14,
+          "divYield": 4.62
+        },
+        {
+          "yr": 2026,
+          "navChg": -6.45,
+          "divYield": 3.81
+        }
+      ]
+    },
+    "FRK01": {
+      "name": "富蘭克林穩定月收益 (月配)",
+      "years": [
+        {
+          "yr": 2009,
+          "navChg": 10.84,
+          "divYield": 2.23
+        },
+        {
+          "yr": 2010,
+          "navChg": 5.99,
+          "divYield": 1.82
+        },
+        {
+          "yr": 2011,
+          "navChg": -0.07,
+          "divYield": 2.33
+        },
+        {
+          "yr": 2012,
+          "navChg": 6.12,
+          "divYield": 2.24
+        },
+        {
+          "yr": 2013,
+          "navChg": 8.13,
+          "divYield": 2.02
+        },
+        {
+          "yr": 2014,
+          "navChg": 2.51,
+          "divYield": 2.14
+        },
+        {
+          "yr": 2015,
+          "navChg": -3.18,
+          "divYield": 1.92
+        },
+        {
+          "yr": 2016,
+          "navChg": 3.47,
+          "divYield": 1.79
+        },
+        {
+          "yr": 2017,
+          "navChg": 7.98,
+          "divYield": 3.57
+        },
+        {
+          "yr": 2018,
+          "navChg": -6.2,
+          "divYield": 2.37
+        },
+        {
+          "yr": 2019,
+          "navChg": 12.47,
+          "divYield": 2.99
+        },
+        {
+          "yr": 2020,
+          "navChg": 7.65,
+          "divYield": 2.18
+        },
+        {
+          "yr": 2021,
+          "navChg": 5.25,
+          "divYield": 1.65
+        },
+        {
+          "yr": 2022,
+          "navChg": -16.41,
+          "divYield": 1.9
+        },
+        {
+          "yr": 2023,
+          "navChg": 9.21,
+          "divYield": 3.04
+        },
+        {
+          "yr": 2024,
+          "navChg": 4.65,
+          "divYield": 3.24
+        },
+        {
+          "yr": 2025,
+          "navChg": 9.88,
+          "divYield": 3.27
+        },
+        {
+          "yr": 2026,
+          "navChg": -0.34,
+          "divYield": 2.13
+        }
+      ]
+    },
+    "JPM02": {
+      "name": "摩根環球非投資等級債 (月配)",
+      "years": [
+        {
+          "yr": 2018,
+          "navChg": -8.06,
+          "divYield": 5.79
+        },
+        {
+          "yr": 2019,
+          "navChg": 7.59,
+          "divYield": 6.36
+        },
+        {
+          "yr": 2020,
+          "navChg": 0.39,
+          "divYield": 5.33
+        },
+        {
+          "yr": 2021,
+          "navChg": -0.17,
+          "divYield": 5.06
+        },
+        {
+          "yr": 2022,
+          "navChg": -16.17,
+          "divYield": 5.09
+        },
+        {
+          "yr": 2023,
+          "navChg": 5.27,
+          "divYield": 6.97
+        },
+        {
+          "yr": 2024,
+          "navChg": 1.21,
+          "divYield": 6.97
+        },
+        {
+          "yr": 2025,
+          "navChg": 1.64,
+          "divYield": 6.9
+        },
+        {
+          "yr": 2026,
+          "navChg": NaN,
+          "divYield": 5.65
+        }
+      ]
+    },
+    "BLK02": {
+      "name": "貝萊德全球智慧數據股票入息 (A10)",
+      "years": [
+        {
+          "yr": 2012,
+          "navChg": 8.25,
+          "divYield": 3.09
+        },
+        {
+          "yr": 2013,
+          "navChg": 29.36,
+          "divYield": 3.19
+        },
+        {
+          "yr": 2014,
+          "navChg": 8.7,
+          "divYield": 2.85
+        },
+        {
+          "yr": 2015,
+          "navChg": -3.24,
+          "divYield": 2.88
+        },
+        {
+          "yr": 2016,
+          "navChg": 12.99,
+          "divYield": 3.26
+        },
+        {
+          "yr": 2017,
+          "navChg": 17.44,
+          "divYield": 3.09
+        },
+        {
+          "yr": 2018,
+          "navChg": -8.21,
+          "divYield": 2.81
+        },
+        {
+          "yr": 2019,
+          "navChg": 23.31,
+          "divYield": 3.67
+        },
+        {
+          "yr": 2020,
+          "navChg": 10.74,
+          "divYield": 3.5
+        },
+        {
+          "yr": 2021,
+          "navChg": 26.02,
+          "divYield": 3.51
+        },
+        {
+          "yr": 2022,
+          "navChg": -6.54,
+          "divYield": 3.17
+        },
+        {
+          "yr": 2023,
+          "navChg": 0.78,
+          "divYield": 3.52
+        },
+        {
+          "yr": 2024,
+          "navChg": 7.66,
+          "divYield": 3.92
+        },
+        {
+          "yr": 2025,
+          "navChg": 0.4,
+          "divYield": 3.83
+        },
+        {
+          "yr": 2026,
+          "navChg": 24.68,
+          "divYield": 2.83
+        }
+      ]
+    },
+    "SCH01": {
+      "name": "施羅德環球股債收息 (月配)",
+      "years": [
+        {
+          "yr": 2009,
+          "navChg": 5.41,
+          "divYield": 2.46
+        },
+        {
+          "yr": 2010,
+          "navChg": 5.46,
+          "divYield": 1.88
+        },
+        {
+          "yr": 2011,
+          "navChg": 1.95,
+          "divYield": 2.4
+        },
+        {
+          "yr": 2012,
+          "navChg": 4.19,
+          "divYield": 2.01
+        },
+        {
+          "yr": 2013,
+          "navChg": 4.68,
+          "divYield": 1.83
+        },
+        {
+          "yr": 2014,
+          "navChg": 1.84,
+          "divYield": 2.12
+        },
+        {
+          "yr": 2015,
+          "navChg": -2.94,
+          "divYield": 1.85
+        },
+        {
+          "yr": 2016,
+          "navChg": 2.81,
+          "divYield": 1.89
+        },
+        {
+          "yr": 2017,
+          "navChg": 6.52,
+          "divYield": 3.1
+        },
+        {
+          "yr": 2018,
+          "navChg": -5.57,
+          "divYield": 2.53
+        },
+        {
+          "yr": 2019,
+          "navChg": 10.76,
+          "divYield": 3.01
+        },
+        {
+          "yr": 2020,
+          "navChg": 6.93,
+          "divYield": 2.25
+        },
+        {
+          "yr": 2021,
+          "navChg": 3.25,
+          "divYield": 1.6
+        },
+        {
+          "yr": 2022,
+          "navChg": -16.0,
+          "divYield": 1.89
+        },
+        {
+          "yr": 2023,
+          "navChg": 7.56,
+          "divYield": 3.15
+        },
+        {
+          "yr": 2024,
+          "navChg": 3.18,
+          "divYield": 3.33
+        },
+        {
+          "yr": 2025,
+          "navChg": 7.59,
+          "divYield": 3.53
+        },
+        {
+          "yr": 2026,
+          "navChg": -1.0,
+          "divYield": 2.59
+        }
+      ]
+    },
+    "UBS01": {
+      "name": "瑞銀美國總收益股票 (月配)",
+      "years": [
+        {
+          "yr": 2007,
+          "navChg": 4.0,
+          "divYield": 1.62
+        },
+        {
+          "yr": 2008,
+          "navChg": -28.26,
+          "divYield": 1.83
+        },
+        {
+          "yr": 2009,
+          "navChg": 16.74,
+          "divYield": 2.44
+        },
+        {
+          "yr": 2010,
+          "navChg": 12.31,
+          "divYield": 2.24
+        },
+        {
+          "yr": 2011,
+          "navChg": 3.84,
+          "divYield": 2.23
+        },
+        {
+          "yr": 2012,
+          "navChg": 9.0,
+          "divYield": 2.58
+        },
+        {
+          "yr": 2013,
+          "navChg": 26.31,
+          "divYield": 2.33
+        },
+        {
+          "yr": 2014,
+          "navChg": 7.87,
+          "divYield": 2.11
+        },
+        {
+          "yr": 2015,
+          "navChg": -4.19,
+          "divYield": 2.24
+        },
+        {
+          "yr": 2016,
+          "navChg": 9.54,
+          "divYield": 2.35
+        },
+        {
+          "yr": 2017,
+          "navChg": 19.78,
+          "divYield": 2.25
+        },
+        {
+          "yr": 2018,
+          "navChg": -4.0,
+          "divYield": 2.0
+        },
+        {
+          "yr": 2019,
+          "navChg": 27.27,
+          "divYield": 2.18
+        },
+        {
+          "yr": 2020,
+          "navChg": 13.24,
+          "divYield": 1.84
+        },
+        {
+          "yr": 2021,
+          "navChg": 21.66,
+          "divYield": 1.88
+        },
+        {
+          "yr": 2022,
+          "navChg": -11.59,
+          "divYield": 1.73
+        },
+        {
+          "yr": 2023,
+          "navChg": 12.22,
+          "divYield": 2.11
+        },
+        {
+          "yr": 2024,
+          "navChg": 14.92,
+          "divYield": 1.98
+        },
+        {
+          "yr": 2025,
+          "navChg": 12.23,
+          "divYield": 1.82
+        },
+        {
+          "yr": 2026,
+          "navChg": 9.28,
+          "divYield": 7.0
+        }
+      ]
+    },
+    "FUB01": {
+      "name": "富邦人壽全委月撥回帳戶 (穩健型)",
+      "years": [
+        {
+          "yr": 2009,
+          "navChg": 16.37,
+          "divYield": 2.41
+        },
+        {
+          "yr": 2010,
+          "navChg": 8.98,
+          "divYield": 2.01
+        },
+        {
+          "yr": 2011,
+          "navChg": -1.27,
+          "divYield": 2.38
+        },
+        {
+          "yr": 2012,
+          "navChg": 9.09,
+          "divYield": 2.27
+        },
+        {
+          "yr": 2013,
+          "navChg": 13.34,
+          "divYield": 2.18
+        },
+        {
+          "yr": 2014,
+          "navChg": 4.21,
+          "divYield": 2.2
+        },
+        {
+          "yr": 2015,
+          "navChg": -3.09,
+          "divYield": 2.05
+        },
+        {
+          "yr": 2016,
+          "navChg": 4.37,
+          "divYield": 1.87
+        },
+        {
+          "yr": 2017,
+          "navChg": 10.69,
+          "divYield": 4.99
+        },
+        {
+          "yr": 2018,
+          "navChg": -8.04,
+          "divYield": 2.29
+        },
+        {
+          "yr": 2019,
+          "navChg": 15.81,
+          "divYield": 2.97
+        },
+        {
+          "yr": 2020,
+          "navChg": 9.11,
+          "divYield": 2.06
+        },
+        {
+          "yr": 2021,
+          "navChg": 9.35,
+          "divYield": 1.79
+        },
+        {
+          "yr": 2022,
+          "navChg": -17.38,
+          "divYield": 1.75
+        },
+        {
+          "yr": 2023,
+          "navChg": 12.79,
+          "divYield": 2.82
+        },
+        {
+          "yr": 2024,
+          "navChg": 7.76,
+          "divYield": 2.86
+        },
+        {
+          "yr": 2025,
+          "navChg": 13.42,
+          "divYield": 2.89
+        },
+        {
+          "yr": 2026,
+          "navChg": 1.31,
+          "divYield": 1.76
+        }
+      ]
+    }
+  }
+}
