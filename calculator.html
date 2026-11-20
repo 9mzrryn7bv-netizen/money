@@ -220,11 +220,11 @@ tfoot td{padding:9px 12px;font-size:.73rem;color:var(--txt3);font-style:italic;b
 .bt-pill.active .bt-pill-yr{color:var(--blue)}
 .bt-pill-desc{font-size:.66rem;color:var(--txt2);line-height:1.35}
 
-.bt-hud{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
-@media(max-width:680px){.bt-hud{grid-template-columns:repeat(2,1fr)}}
+.bt-hud{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:780px){.bt-hud{grid-template-columns:repeat(2,1fr)}}
 .bt-stat{background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:12px 14px}
 .bt-stat-l{font-size:.61rem;color:var(--txt3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
-.bt-stat-v{font-size:1.12rem;font-weight:900;font-variant-numeric:tabular-nums}
+.bt-stat-v{font-size:1.08rem;font-weight:900;font-variant-numeric:tabular-nums}
 .bt-stat-s{font-size:.63rem;color:var(--txt2);margin-top:3px}
 
 .bt-event-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:10px;background:var(--bg3);border:1px solid var(--border);margin-bottom:12px;font-size:.76rem;flex-wrap:wrap}
@@ -482,7 +482,7 @@ tfoot td{padding:9px 12px;font-size:.73rem;color:var(--txt3);font-style:italic;b
 </div>
 </div>
 
-<!-- PAGE 4: 歷史壓力測試（動態標的搜尋組合 + 20年動畫） -->
+<!-- PAGE 4: 歷史壓力測試（本金 / 利息 / 本金+含息 / 貸款餘額 20年動畫） -->
 <div class="page" id="page4">
 <div class="page-inner">
   <div class="card">
@@ -490,7 +490,7 @@ tfoot td{padding:9px 12px;font-size:.73rem;color:var(--txt3);font-style:italic;b
       <div class="ci ci-r"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d42b2b" stroke-width="2.2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
       <div>
         <div class="ct">歷史標的 20 年長期壓力測試</div>
-        <div class="cs">自由搜尋並搭配富邦熱門月配息標的，檢驗 20 年動態穩定度</div>
+        <div class="cs">自由搜尋並搭配富邦熱門月配息標的，檢驗本金、含息與貸款餘額 20 年變化</div>
       </div>
       <div class="bt-src-badge" id="bt-src-badge">載入資料中...</div>
     </div>
@@ -525,18 +525,20 @@ tfoot td{padding:9px 12px;font-size:.73rem;color:var(--txt3);font-style:italic;b
     </div>
 
     <div class="bt-hud">
-      <div class="bt-stat"><div class="bt-stat-l">投資市值</div><div class="bt-stat-v vg" id="bt-v-mkt">—</div><div class="bt-stat-s" id="bt-s-nav">年度加權波動 —</div></div>
-      <div class="bt-stat"><div class="bt-stat-l">貸款餘額</div><div class="bt-stat-v vr" id="bt-v-loan">—</div><div class="bt-stat-s">剩餘本金</div></div>
-      <div class="bt-stat"><div class="bt-stat-l">備用金水位</div><div class="bt-stat-v vgold" id="bt-v-res">—</div><div class="bt-stat-s">自動填補月缺口</div></div>
-      <div class="bt-stat"><div class="bt-stat-l">當年月可動用</div><div class="bt-stat-v" id="bt-v-free">—</div><div class="bt-stat-s" id="bt-s-margin">維持率 —</div></div>
+      <div class="bt-stat"><div class="bt-stat-l">本金（投資市值）</div><div class="bt-stat-v vg" id="bt-v-mkt">—</div><div class="bt-stat-s" id="bt-s-nav">年度加權波動 —</div></div>
+      <div class="bt-stat"><div class="bt-stat-l">利息（累積配息）</div><div class="bt-stat-v vgold" id="bt-v-div">—</div><div class="bt-stat-s" id="bt-s-div">累計領回配息</div></div>
+      <div class="bt-stat"><div class="bt-stat-l">本金＋含息（總值）</div><div class="bt-stat-v vb" id="bt-v-total">—</div><div class="bt-stat-s" id="bt-s-roi">累積含息報酬 —</div></div>
+      <div class="bt-stat"><div class="bt-stat-l">貸款餘額</div><div class="bt-stat-v vr" id="bt-v-loan">—</div><div class="bt-stat-s" id="bt-s-loan">剩餘本金</div></div>
+      <div class="bt-stat"><div class="bt-stat-l">當年月可動用</div><div class="bt-stat-v" id="bt-v-free">—</div><div class="bt-stat-s" id="bt-s-margin">備用金 —</div></div>
     </div>
 
     <div class="bt-canvas-wrap"><canvas id="bt-canvas"></canvas></div>
 
     <div class="bt-legend">
-      <div class="bt-leg-item"><span class="bt-leg-line" style="background:#008a5e"></span>投資市值</div>
+      <div class="bt-leg-item"><span class="bt-leg-line" style="background:#1d5fd4"></span>本金＋含息</div>
+      <div class="bt-leg-item"><span class="bt-leg-line" style="background:#008a5e"></span>本金（投資市值）</div>
+      <div class="bt-leg-item"><span class="bt-leg-line" style="background:#c08a00"></span>利息（累積配息）</div>
       <div class="bt-leg-item"><span class="bt-leg-line" style="background:#d42b2b;border-top:2px dashed #d42b2b;height:0"></span>貸款餘額</div>
-      <div class="bt-leg-item"><span class="bt-leg-line" style="background:#c08a00"></span>備用金水位</div>
     </div>
 
     <div class="bt-controls">
@@ -915,28 +917,19 @@ function updateWeightSum(){
 function addSelectedFund(){
   const code = el('bt-select').value;
   if(!code) return;
-  if(selectedFunds.some(f => f.code === code)){
-    alert(code + ' 已在組合中');
-    return;
-  }
+  if(selectedFunds.some(f => f.code === code)){ alert(code + ' 已在組合中'); return; }
   selectedFunds.push({ code, weight: 20 });
-  renderSelectedFunds();
-  runBacktest();
-  drawBTFrame(btProgress);
+  renderSelectedFunds(); runBacktest(); drawBTFrame(btProgress);
 }
 
 function removeFund(idx){
   selectedFunds.splice(idx, 1);
-  renderSelectedFunds();
-  runBacktest();
-  drawBTFrame(btProgress);
+  renderSelectedFunds(); runBacktest(); drawBTFrame(btProgress);
 }
 
 function updateFundWeight(idx, val){
   selectedFunds[idx].weight = Math.max(0, Number(val) || 0);
-  updateWeightSum();
-  runBacktest();
-  drawBTFrame(btProgress);
+  updateWeightSum(); runBacktest(); drawBTFrame(btProgress);
 }
 
 function equalizeWeights(){
@@ -944,38 +937,31 @@ function equalizeWeights(){
   const base = Math.floor(100 / selectedFunds.length);
   let rem = 100 - base * selectedFunds.length;
   selectedFunds.forEach((f, i) => { f.weight = base + (i < rem ? 1 : 0); });
-  renderSelectedFunds();
-  runBacktest();
-  drawBTFrame(btProgress);
+  renderSelectedFunds(); runBacktest(); drawBTFrame(btProgress);
 }
 
-// 自動讀取 GitHub Actions 產出的 funds_data.json
 fetch('./funds_data.json?t=' + Date.now())
   .then(r => { if(!r.ok) throw new Error('no json'); return r.json(); })
   .then(data => {
     if(data && data.funds && Object.keys(data.funds).length > 0){
       fundDB = data;
-      const cnt = Object.keys(data.funds).length;
-      set('bt-src-badge', `✓ 自動同步 ${cnt} 檔（${data.updated_at}）`);
+      set('bt-src-badge', `✓ 自動同步 ${Object.keys(data.funds).length} 檔（${data.updated_at}）`);
     } else {
       set('bt-src-badge', `內建 ${Object.keys(DEFAULT_FUND_DB.funds).length} 檔熱門標的`);
     }
-    renderFundOptions();
-    renderSelectedFunds();
+    renderFundOptions(); renderSelectedFunds();
     if(el('page4').classList.contains('active')){ runBacktest(); drawBTFrame(btProgress); }
   })
   .catch(() => {
     set('bt-src-badge', `內建 ${Object.keys(DEFAULT_FUND_DB.funds).length} 檔熱門標的`);
-    renderFundOptions();
-    renderSelectedFunds();
+    renderFundOptions(); renderSelectedFunds();
   });
 
 function selectStartYr(yr){
   btStartYr = yr;
   document.querySelectorAll('.bt-pill').forEach(p=>p.classList.remove('active'));
   el('bt-p-'+yr).classList.add('active');
-  runBacktest();
-  replayAnim();
+  runBacktest(); replayAnim();
 }
 
 function getPortfolioYearStats(calYr){
@@ -987,10 +973,7 @@ function getPortfolioYearStats(calYr){
     if(!fObj || !fObj.years || !fObj.years.length) return;
     const yrs = fObj.years;
     let pt = yrs.find(x => x.yr === calYr);
-    if(!pt){
-      const idx = Math.abs(calYr - yrs[0].yr) % yrs.length;
-      pt = yrs[idx];
-    }
+    if(!pt){ pt = yrs[Math.abs(calYr - yrs[0].yr) % yrs.length]; }
     wSum += w; navSum += w * pt.navChg; divSum += w * pt.divYield;
   });
   if(wSum <= 0) return { navChg: 0, divYield: lastParams.DR || 8 };
@@ -999,13 +982,14 @@ function getPortfolioYearStats(calYr){
 
 function runBacktest(){
   const p = lastParams;
-  let invBal = p.totalInvested, loanBal = p.LA, resBal = p.reserveAmt;
+  let invBal = p.totalInvested, loanBal = p.LA, resBal = p.reserveAmt, cumDiv = 0;
   const isFin = (p.loanMode === 'financial'), riRate = p.RI / 100;
   let resDepletedYr = null, marginCallYr = null, minMargin = Infinity;
 
   btData = [{
     yr: 0, calYr: btStartYr, event: '期初進場配置',
-    navChg: 0, divYield: 0, invBal, loanBal, resBal, avgFree: 0,
+    navChg: 0, divYield: 0, invBal, cumDiv: 0, totalVal: invBal,
+    loanBal, resBal, avgFree: 0,
     marginRatio: calcMarginRatio(invBal, p.leverageAmt)
   }];
 
@@ -1026,6 +1010,8 @@ function runBacktest(){
       }
       const md = invBal * (divYield / 100) / 12 - p.monthlyLevCost;
       const ri = Math.max(0, md) * riRate;
+      const cashDiv = Math.max(0, md - ri);
+      cumDiv += cashDiv;
       const free = md - ri - curPay;
       annFree += free; invBal += ri;
       if(free < 0) resBal = Math.max(0, resBal + free);
@@ -1037,8 +1023,8 @@ function runBacktest(){
 
     btData.push({
       yr, calYr, event: YEAR_EVENTS[calYr] || '歷史循環推演',
-      navChg, divYield, invBal, loanBal, resBal,
-      avgFree: annFree / 12, marginRatio: mRatio
+      navChg, divYield, invBal, cumDiv, totalVal: invBal + cumDiv,
+      loanBal, resBal, avgFree: annFree / 12, marginRatio: mRatio
     });
   }
 
@@ -1050,11 +1036,11 @@ function runBacktest(){
   } else if(resDepletedYr !== null){
     vd.className = 'verd vv-even'; set('bt-vi', '⚡');
     set('bt-vh', `備用金於第 ${resDepletedYr} 年耗盡，需額外現金流支撐`);
-    set('bt-vp', `第 20 年期末投資市值 ${fmtW(last.invBal)}、貸款餘額 ${fmtW(last.loanBal)}。建議調高備用金比例或降低回流再投入比例。`);
+    set('bt-vp', `第 20 年本金市值 ${fmtW(last.invBal)} ＋ 累積配息 ${fmtW(last.cumDiv)} ＝ 含息總值 ${fmtW(last.totalVal)}，期末貸款餘額 ${fmtW(last.loanBal)}。`);
   } else {
     vd.className = 'verd vv-win'; set('bt-vi', '✓');
     set('bt-vh', `穩定通過 ${btStartYr} 起點 20 年歷史壓力測試！`);
-    set('bt-vp', `歷經多次市場修正，備用金全程未耗盡（期末剩 ${fmtW(last.resBal)}），第 20 年投資市值達 ${fmtW(last.invBal)}，貸款餘額 ${fmtW(last.loanBal)}。`);
+    set('bt-vp', `第 20 年本金市值 ${fmtW(last.invBal)} ＋ 累積配息 ${fmtW(last.cumDiv)} ＝ 含息總值 ${fmtW(last.totalVal)}，期末貸款餘額 ${fmtW(last.loanBal)}，備用金剩 ${fmtW(last.resBal)}。`);
   }
 }
 
@@ -1091,10 +1077,14 @@ function drawBTFrame(prog){
   const idx = Math.min(19, Math.floor(prog)), frac = prog - idx;
   const a = btData[idx], b = btData[Math.min(20, idx+1)];
   const curInv = a.invBal + (b.invBal - a.invBal)*frac;
+  const curDiv = a.cumDiv + (b.cumDiv - a.cumDiv)*frac;
+  const curTotal = a.totalVal + (b.totalVal - a.totalVal)*frac;
   const curLoan = a.loanBal + (b.loanBal - a.loanBal)*frac;
   const curRes = a.resBal + (b.resBal - a.resBal)*frac;
   const curFree = a.avgFree + (b.avgFree - a.avgFree)*frac;
   const dispPt = btData[Math.round(prog)];
+  const baseInv = btData[0].invBal || 1;
+  const totalRoi = ((curTotal - baseInv) / baseInv) * 100;
 
   el('bt-scrub').value = prog;
   set('bt-scrub-lbl', `第 ${Math.round(prog)} 年`);
@@ -1103,9 +1093,14 @@ function drawBTFrame(prog){
 
   set('bt-v-mkt', fmtW(curInv));
   set('bt-s-nav', dispPt.yr===0 ? '期初投入' : `當年波動 ${dispPt.navChg>=0?'+':''}${dispPt.navChg.toFixed(1)}%`);
-  set('bt-v-loan', fmtW(curLoan)); set('bt-v-res', fmtW(curRes));
+  set('bt-v-div', fmtW(curDiv));
+  set('bt-s-div', dispPt.yr===0 ? '累計領回配息' : `當年度配息率 ${dispPt.divYield.toFixed(1)}%`);
+  set('bt-v-total', fmtW(curTotal));
+  set('bt-s-roi', `含息累積報酬 ${totalRoi>=0?'+':''}${totalRoi.toFixed(1)}%`);
+  set('bt-v-loan', curLoan < 1 ? '已還清' : fmtW(curLoan), curLoan < 1 ? 'var(--green)' : 'var(--red)');
+  set('bt-s-loan', lastParams.loanMode === 'financial' ? '到期一次還本' : (curLoan < 1 ? '貸款已結清' : '剩餘本金'));
   set('bt-v-free', ss(curFree)+' 元', curFree>=0 ? 'var(--green)' : 'var(--red)');
-  set('bt-s-margin', lastParams.leverageAmt>0 ? `維持率 ${fmtP(dispPt.marginRatio,1)}` : '無槓桿');
+  set('bt-s-margin', lastParams.leverageAmt>0 ? `維持率 ${fmtP(dispPt.marginRatio,1)}｜備用 ${fmtW(curRes)}` : `備用金剩餘 ${fmtW(curRes)}`);
 
   const badge = el('bt-status-badge');
   if(lastParams.leverageAmt>0 && dispPt.marginRatio<130){ badge.className='bt-event-badge bt-b-bad'; badge.textContent='⚠ 觸及追繳警示'; }
@@ -1123,7 +1118,7 @@ function drawBTFrame(prog){
   const cw = Wc - pad.l - pad.r, ch = Hc - pad.t - pad.b;
 
   let maxY = 1000000;
-  btData.forEach(d=>{ maxY = Math.max(maxY, d.invBal, d.loanBal, d.resBal); });
+  btData.forEach(d=>{ maxY = Math.max(maxY, d.totalVal, d.invBal, d.cumDiv, d.loanBal); });
   maxY *= 1.12;
 
   const xOf = yr => pad.l + (yr / 20) * cw;
@@ -1160,9 +1155,14 @@ function drawBTFrame(prog){
     ctx.restore();
   }
 
-  drawSeries(d=>d.invBal, '#008a5e', false, 'rgba(0,138,94,0.09)');
+  // 1. 本金＋含息（藍實線 + 淺藍底）
+  drawSeries(d=>d.totalVal, '#1d5fd4', false, 'rgba(29,95,212,0.08)');
+  // 2. 本金（綠實線）
+  drawSeries(d=>d.invBal, '#008a5e', false, null);
+  // 3. 利息（金實線）
+  drawSeries(d=>d.cumDiv, '#c08a00', false, null);
+  // 4. 貸款餘額（紅虛線）
   drawSeries(d=>d.loanBal, '#d42b2b', true, null);
-  drawSeries(d=>d.resBal, '#c08a00', false, null);
 }
 
 window.addEventListener('resize', ()=>{ if(el('page4').classList.contains('active')) drawBTFrame(btProgress); });
