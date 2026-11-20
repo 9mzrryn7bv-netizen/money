@@ -59,31 +59,43 @@ def load_existing():
 
 def fetch_nav_history(dj_id):
     today = datetime.utcnow().strftime("%Y-%m-%d")
+    # 依序嘗試抓「全部歷史」與「自訂 2008 至今」參數，取資料筆數最多者
+    param_variants = [
+        f"a={dj_id}&b=0&c=2008-01-01&d={today}",
+        f"a={dj_id}&c=2008-01-01&d={today}",
+        f"a={dj_id}&b=5&c=2008-01-01&d={today}",
+    ]
+    best_records = []
     for host in HOSTS:
-        url = f"{host}/w/bcd/BCDNavList.djbcd?a={dj_id}&b=1&c=2008-01-01&d={today}"
-        try:
-            text = http_get(url).strip()
-            parts = text.split()
-            if len(parts) < 2:
-                continue
-            dates = parts[0].split(",")
-            navs = parts[1].split(",")
-            if len(dates) != len(navs) or len(dates) < 20:
-                continue
-            records = []
-            for d_str, n_str in zip(dates, navs):
-                try:
-                    yr = int(d_str.replace("-", "/")[:4])
-                    val = float(n_str)
-                    if val > 0:
-                        records.append((yr, d_str, val))
-                except Exception:
+        for params in param_variants:
+            url = f"{host}/w/bcd/BCDNavList.djbcd?{params}"
+            try:
+                text = http_get(url).strip()
+                parts = text.split()
+                if len(parts) < 2:
                     continue
-            if len(records) >= 20:
-                return records
-        except Exception:
-            continue
-    return None
+                dates = parts[0].split(",")
+                navs = parts[1].split(",")
+                if len(dates) != len(navs) or len(dates) < 20:
+                    continue
+                records = []
+                for d_str, n_str in zip(dates, navs):
+                    try:
+                        yr = int(d_str.replace("-", "/")[:4])
+                        val = float(n_str)
+                        if val > 0:
+                            records.append((yr, d_str, val))
+                    except Exception:
+                        continue
+                if len(records) > len(best_records):
+                    best_records = records
+                if len(best_records) > 1000:
+                    return best_records
+            except Exception:
+                continue
+        if len(best_records) > 250:
+            return best_records
+    return best_records if len(best_records) >= 20 else None
 
 def fetch_div_history(dj_id):
     """抓取年度配息總額，回傳 {year: total_div_amount}"""
@@ -94,7 +106,6 @@ def fetch_div_history(dj_id):
             html = http_get(url)
             if not html:
                 continue
-            # 擷取表格中的「除息日 (YYYY/MM/DD) ... 配息金額」
             rows = re.findall(r"(\d{4}/\d{2}/\d{2})</t[dh]>\s*<t[dh][^>]*>([\d\.]+)", html)
             if rows:
                 for d_str, amt_str in rows:
@@ -114,7 +125,6 @@ def build_annual_series(dj_id, base_yield):
 
     div_by_yr = fetch_div_history(dj_id)
 
-    # 整理每年年底淨值與首筆淨值
     by_yr = {}
     for yr, d_str, val in nav_records:
         if yr not in by_yr:
@@ -133,7 +143,6 @@ def build_annual_series(dj_id, base_yield):
             nav_chg = round(((close_end - ref_nav) / ref_nav) * 100, 2)
             ann_div = div_by_yr.get(yr, 0.0)
             div_yield = round((ann_div / ref_nav) * 100, 2) if ann_div > 0 else base_yield
-            # 若成立首年僅配息 1~2 個月導致年化偏低，改用基準殖利率避免失真
             if div_yield < 1.5 or div_yield > 30:
                 div_yield = base_yield
             series.append({"yr": int(yr), "navChg": nav_chg, "divYield": div_yield})
@@ -151,10 +160,10 @@ def main():
         if series:
             new_funds[code] = {"name": cfg["name"], "years": series}
             updated_any = True
-            print(f"[{code} / {cfg['dj_id']}] 真實資料更新成功（共 {len(series)} 年，最新 {series[-1]['yr']} 年）")
+            print(f"[{code} / {cfg['dj_id']}] 真實資料更新成功（{series[0]['yr']}~{series[-1]['yr']}，共 {len(series)} 年）")
         else:
             print(f"[{code} / {cfg['dj_id']}] 抓取失敗，保留舊資料")
-        time.sleep(0.6)  # 避免請求過快被擋
+        time.sleep(0.5)
 
     if updated_any:
         output = {
@@ -165,7 +174,7 @@ def main():
             json.dump(output, f, ensure_ascii=False, indent=2)
         print("funds_data.json 已更新完成。")
     else:
-        print("本次無任何更新（可能受限於海外 IP），維持原檔案。")
+        print("本次無任何更新，維持原檔案。")
 
 if __name__ == "__main__":
     main()
