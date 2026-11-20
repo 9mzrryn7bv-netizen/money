@@ -7,7 +7,7 @@ from datetime import datetime
 
 DATA_FILE = "funds_data.json"
 
-# 15 檔熱門月配息基金真實 MoneyDJ 代碼對照表
+# 15 檔熱門月配息基金（維持原始代碼不變）
 FUND_MAP = {
     "JFP11": {"name": "摩根多重收益 (美元對沖/穩定月配)", "dj_id": "JFZA5", "base_yield": 6.8},
     "MLE24": {"name": "貝萊德世界科技 (A10美元/穩定月配)", "dj_id": "SHZV9", "base_yield": 8.5},
@@ -59,11 +59,9 @@ def load_existing():
 
 def fetch_nav_history(dj_id):
     today = datetime.utcnow().strftime("%Y-%m-%d")
-    # 依序嘗試抓「全部歷史」與「自訂 2008 至今」參數，取資料筆數最多者
     param_variants = [
-        f"a={dj_id}&b=0&c=2008-01-01&d={today}",
         f"a={dj_id}&c=2008-01-01&d={today}",
-        f"a={dj_id}&b=5&c=2008-01-01&d={today}",
+        f"a={dj_id}&b=0&c=2008-01-01&d={today}",
     ]
     best_records = []
     for host in HOSTS:
@@ -81,10 +79,11 @@ def fetch_nav_history(dj_id):
                 records = []
                 for d_str, n_str in zip(dates, navs):
                     try:
-                        yr = int(d_str.replace("-", "/")[:4])
+                        d_norm = d_str.replace("/", "-")
+                        ym = d_norm[:7]
                         val = float(n_str)
-                        if val > 0:
-                            records.append((yr, d_str, val))
+                        if len(ym) == 7 and val > 0:
+                            records.append((ym, val))
                     except Exception:
                         continue
                 if len(records) > len(best_records):
@@ -98,8 +97,8 @@ def fetch_nav_history(dj_id):
     return best_records if len(best_records) >= 20 else None
 
 def fetch_div_history(dj_id):
-    """抓取年度配息總額，回傳 {year: total_div_amount}"""
-    div_by_yr = {}
+    """抓取每月配息金額，回傳 {'YYYY-MM': div_amount}"""
+    div_by_ym = {}
     for host in HOSTS:
         url = f"{host}/w/wb/wb05.djhtm?a={dj_id}"
         try:
@@ -109,46 +108,38 @@ def fetch_div_history(dj_id):
             rows = re.findall(r"(\d{4}/\d{2}/\d{2})</t[dh]>\s*<t[dh][^>]*>([\d\.]+)", html)
             if rows:
                 for d_str, amt_str in rows:
-                    yr = int(d_str[:4])
+                    ym = d_str[:7].replace("/", "-")
                     amt = float(amt_str)
                     if 0 < amt < 50:
-                        div_by_yr[yr] = div_by_yr.get(yr, 0.0) + amt
-                return div_by_yr
+                        div_by_ym[ym] = round(div_by_ym.get(ym, 0.0) + amt, 5)
+                return div_by_ym
         except Exception:
             continue
-    return div_by_yr
+    return div_by_ym
 
-def build_annual_series(dj_id, base_yield):
+def build_monthly_series(dj_id, base_yield):
     nav_records = fetch_nav_history(dj_id)
     if not nav_records:
         return None
 
-    div_by_yr = fetch_div_history(dj_id)
+    div_by_ym = fetch_div_history(dj_id)
+    has_real_div = len(div_by_ym) > 0
 
-    by_yr = {}
-    for yr, d_str, val in nav_records:
-        if yr not in by_yr:
-            by_yr[yr] = {"first": val, "last": val}
+    # 每月取最後一筆原始淨值
+    nav_by_ym = {}
+    for ym, val in nav_records:
+        nav_by_ym[ym] = val
+
+    months = []
+    for ym in sorted(nav_by_ym.keys()):
+        nav = round(nav_by_ym[ym], 4)
+        if has_real_div:
+            div = div_by_ym.get(ym, 0.0)
         else:
-            by_yr[yr]["last"] = val
+            div = round(nav * (base_yield / 100.0 / 12.0), 5)
+        months.append({"ym": ym, "nav": nav, "div": div})
 
-    years = sorted(by_yr.keys())
-    series = []
-    prev_close = None
-
-    for yr in years:
-        close_end = by_yr[yr]["last"]
-        ref_nav = prev_close if prev_close else by_yr[yr]["first"]
-        if ref_nav and ref_nav > 0:
-            nav_chg = round(((close_end - ref_nav) / ref_nav) * 100, 2)
-            ann_div = div_by_yr.get(yr, 0.0)
-            div_yield = round((ann_div / ref_nav) * 100, 2) if ann_div > 0 else base_yield
-            if div_yield < 1.5 or div_yield > 30:
-                div_yield = base_yield
-            series.append({"yr": int(yr), "navChg": nav_chg, "divYield": div_yield})
-        prev_close = close_end
-
-    return series if len(series) >= 1 else None
+    return months if len(months) >= 6 else None
 
 def main():
     old_data = load_existing()
@@ -156,11 +147,11 @@ def main():
     updated_any = False
 
     for code, cfg in FUND_MAP.items():
-        series = build_annual_series(cfg["dj_id"], cfg["base_yield"])
-        if series:
-            new_funds[code] = {"name": cfg["name"], "years": series}
+        months = build_monthly_series(cfg["dj_id"], cfg["base_yield"])
+        if months:
+            new_funds[code] = {"name": cfg["name"], "months": months}
             updated_any = True
-            print(f"[{code} / {cfg['dj_id']}] 真實資料更新成功（{series[0]['yr']}~{series[-1]['yr']}，共 {len(series)} 年）")
+            print(f"[{code} / {cfg['dj_id']}] 成功 | 最新淨值: {months[-1]['nav']} ({months[-1]['ym']}) | 共 {len(months)} 個月")
         else:
             print(f"[{code} / {cfg['dj_id']}] 抓取失敗，保留舊資料")
         time.sleep(0.5)
