@@ -265,7 +265,7 @@ tfoot td{padding:9px 12px;font-size:.73rem;color:var(--txt3);font-style:italic;b
   <button class="tab-btn" id="tab1" onclick="goTab(1)"><div class="tab-dot"></div>② 投資設定</button>
   <button class="tab-btn" id="tab2" onclick="goTab(2)"><div class="tab-dot"></div>③ 結果總覽</button>
   <button class="tab-btn" id="tab3" onclick="goTab(3)"><div class="tab-dot"></div>④ 年度試算表</button>
-  <button class="tab-btn" id="tab4" onclick="goTab(4)"><div class="tab-dot"></div>⑤ 歷史壓力測試(先不要用還在改）</button>
+  <button class="tab-btn" id="tab4" onclick="goTab(4)"><div class="tab-dot"></div>⑤ 歷史壓力測試</button>
 </div>
 
 <div class="pages">
@@ -482,20 +482,19 @@ tfoot td{padding:9px 12px;font-size:.73rem;color:var(--txt3);font-style:italic;b
 </div>
 </div>
 
-<!-- PAGE 4: 歷史壓力測試（本金 / 利息 / 本金+含息 / 貸款餘額 20年動畫） -->
+<!-- PAGE 4: 歷史壓力測試（原始淨值 × 單位數 20年動畫） -->
 <div class="page" id="page4">
 <div class="page-inner">
   <div class="card">
     <div class="ch">
       <div class="ci ci-r"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d42b2b" stroke-width="2.2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
       <div>
-        <div class="ct">歷史標的 20 年長期壓力測試</div>
-        <div class="cs">自由搜尋並搭配富邦熱門月配息標的，檢驗本金、含息與貸款餘額 20 年變化</div>
+        <div class="ct">歷史標的 20 年長期壓力測試（原始淨值版）</div>
+        <div class="cs">直接以每月原始淨值與真實配息計算單位數，檢驗本金、含息與貸款餘額</div>
       </div>
       <div class="bt-src-badge" id="bt-src-badge">載入資料中...</div>
     </div>
 
-    <!-- 搜尋加入標的列 -->
     <div class="sec-title">選擇並組合標的（支援代碼或中文關鍵字搜尋）</div>
     <div class="bt-picker-bar">
       <input type="text" id="bt-search" placeholder="搜尋代碼或名稱（如 JFP11、安聯、非投等）..." oninput="renderFundOptions()">
@@ -503,14 +502,12 @@ tfoot td{padding:9px 12px;font-size:.73rem;color:var(--txt3);font-style:italic;b
       <button type="button" class="bt-btn-add" onclick="addSelectedFund()">＋ 加入組合</button>
     </div>
 
-    <!-- 已選標的卡片區 -->
     <div class="bt-funds-grid" id="bt-funds-grid"></div>
     <div class="bt-w-bar">
       <span id="bt-w-sum">總配置比例：100%</span>
       <button type="button" class="bt-w-btn" onclick="equalizeWeights()">一鍵均分權重</button>
     </div>
 
-    <!-- 起始年份 -->
     <div class="sec-title">選擇歷史回測起點</div>
     <div class="bt-pills">
       <button type="button" class="bt-pill active" id="bt-p-2019" onclick="selectStartYr(2019)"><div class="bt-pill-yr">2019 起點</div><div class="bt-pill-desc">疫情前高點 → 2020 震盪 → 2022 升息</div></button>
@@ -525,7 +522,7 @@ tfoot td{padding:9px 12px;font-size:.73rem;color:var(--txt3);font-style:italic;b
     </div>
 
     <div class="bt-hud">
-      <div class="bt-stat"><div class="bt-stat-l">本金（投資市值）</div><div class="bt-stat-v vg" id="bt-v-mkt">—</div><div class="bt-stat-s" id="bt-s-nav">年度加權波動 —</div></div>
+      <div class="bt-stat"><div class="bt-stat-l">本金（投資市值）</div><div class="bt-stat-v vg" id="bt-v-mkt">—</div><div class="bt-stat-s" id="bt-s-nav">依原始淨值計算</div></div>
       <div class="bt-stat"><div class="bt-stat-l">利息（累積配息）</div><div class="bt-stat-v vgold" id="bt-v-div">—</div><div class="bt-stat-s" id="bt-s-div">累計領回配息</div></div>
       <div class="bt-stat"><div class="bt-stat-l">本金＋含息（總值）</div><div class="bt-stat-v vb" id="bt-v-total">—</div><div class="bt-stat-s" id="bt-s-roi">累積含息報酬 —</div></div>
       <div class="bt-stat"><div class="bt-stat-l">貸款餘額</div><div class="bt-stat-v vr" id="bt-v-loan">—</div><div class="bt-stat-s" id="bt-s-loan">剩餘本金</div></div>
@@ -834,34 +831,23 @@ function buildStrats(MR,DR,LR,be,LA,IA,grN,GR,netFull,cover,TM,isP,gap,resv,inv,
 }
 
 /* ══════════════════════════════════════════
-   PAGE 4: 15 檔熱門標的資料庫 + 動態搜尋組合 + 動畫
+   PAGE 4: 原始淨值 × 單位數 20 年回測引擎
 ══════════════════════════════════════════ */
-const mkYrs = (arr, y0=2008) => arr.map((v,i)=>({yr:y0+i, navChg:v[0], divYield:v[1]}));
-const DEFAULT_FUND_DB = {
-  updated_at: "內建 15 檔基準資料",
-  funds: {
-    JFP11:{name:"摩根多重收益 (穩定月配)", years:mkYrs([[-22,6.5],[18,6.8],[8,6.8],[-4,6.6],[10,6.8],[9,6.8],[3,6.5],[-6,6.4],[5,6.6],[7,6.7],[-8,6.5],[10,6.8],[-2,6.5],[6,6.4],[-16,7.0],[7,7.2],[6,7.2],[4,7.0]])},
-    MLE24:{name:"貝萊德世界科技 (A10月配)", years:mkYrs([[-40,7.0],[45,7.5],[14,8.0],[-6,7.8],[15,8.0],[24,8.2],[14,8.2],[4,8.0],[10,8.2],[32,8.5],[-5,8.2],[35,8.5],[42,8.8],[12,8.6],[-38,8.0],[36,8.5],[22,8.8],[10,8.6]])},
-    NGB1: {name:"高盛環球非投資等級債 (月配)", years:mkYrs([[-26,7.2],[32,7.8],[9,7.6],[-2,7.4],[11,7.6],[5,7.5],[-1,7.3],[-8,7.2],[11,7.5],[5,7.4],[-6,7.3],[10,7.5],[1,7.4],[3,7.2],[-15,7.8],[8,8.0],[5,7.9],[3,7.8]])},
-    NGB2: {name:"高盛新興市場債 (月配)", years:mkYrs([[-18,7.4],[24,7.8],[8,7.7],[2,7.5],[13,7.7],[-8,7.4],[2,7.4],[-4,7.3],[7,7.6],[7,7.6],[-9,7.5],[11,7.7],[2,7.6],[-5,7.5],[-20,8.0],[7,8.1],[5,8.0],[4,7.9]])},
-    AIG01:{name:"安聯收益成長 (AM穩定月收)", years:mkYrs([[-28,7.5],[26,8.0],[11,8.0],[-3,7.8],[12,8.0],[16,8.2],[5,8.0],[-5,7.8],[9,8.0],[11,8.2],[-7,8.0],[14,8.2],[12,8.4],[8,8.2],[-21,8.5],[13,8.6],[10,8.5],[5,8.4]])},
-    ABH01:{name:"聯博全球非投資等級債 (AA月配)", years:mkYrs([[-27,7.2],[34,7.8],[10,7.6],[-2,7.5],[12,7.6],[6,7.5],[0,7.4],[-7,7.3],[12,7.6],[6,7.5],[-5,7.4],[11,7.6],[1,7.5],[3,7.3],[-14,7.8],[9,8.0],[6,7.9],[4,7.8]])},
-    ABA01:{name:"聯博美國收益 (AA月配)", years:mkYrs([[-10,6.0],[16,6.2],[7,6.2],[3,6.0],[9,6.1],[-2,6.0],[4,6.0],[-3,5.9],[6,6.1],[5,6.1],[-3,6.0],[9,6.2],[4,6.1],[-2,6.0],[-14,6.5],[6,6.6],[4,6.5],[3,6.4]])},
-    PIM01:{name:"PIMCO 多元收益債 (月配)", years:mkYrs([[-14,6.2],[20,6.5],[8,6.5],[1,6.3],[10,6.5],[-3,6.3],[3,6.3],[-4,6.2],[8,6.4],[6,6.4],[-4,6.3],[10,6.5],[3,6.4],[-1,6.3],[-15,6.8],[7,6.9],[5,6.8],[4,6.7]])},
-    FID01:{name:"富達全球優質債券 (月配)", years:mkYrs([[-6,5.5],[12,5.8],[6,5.8],[4,5.6],[7,5.7],[-2,5.6],[5,5.6],[-2,5.5],[4,5.7],[4,5.7],[-3,5.6],[8,5.8],[5,5.7],[-3,5.6],[-13,6.0],[5,6.1],[4,6.0],[3,5.9]])},
-    FRK01:{name:"富蘭克林穩定月收益 (月配)", years:mkYrs([[-24,7.0],[22,7.2],[9,7.2],[-2,7.0],[10,7.2],[12,7.2],[4,7.0],[-7,6.9],[8,7.1],[9,7.2],[-6,7.0],[11,7.2],[2,7.1],[9,7.0],[-13,7.4],[8,7.5],[6,7.4],[4,7.3]])},
-    JPM02:{name:"摩根環球非投資等級債 (月配)", years:mkYrs([[-25,7.2],[31,7.6],[9,7.5],[-1,7.4],[11,7.5],[5,7.4],[0,7.3],[-6,7.2],[11,7.4],[5,7.4],[-5,7.3],[10,7.5],[2,7.4],[3,7.2],[-14,7.7],[8,7.9],[5,7.8],[3,7.7]])},
-    BLK02:{name:"貝萊德全球智慧數據股票入息 (A10)", years:mkYrs([[-32,7.2],[25,7.6],[10,7.8],[-4,7.6],[11,7.8],[17,7.9],[6,7.8],[-3,7.6],[7,7.8],[15,8.0],[-8,7.8],[18,8.0],[9,8.0],[13,7.9],[-17,8.0],[15,8.1],[12,8.0],[6,7.9]])},
-    SCH01:{name:"施羅德環球股債收息 (月配)", years:mkYrs([[-20,6.2],[17,6.5],[7,6.5],[-3,6.4],[9,6.5],[8,6.5],[3,6.4],[-5,6.3],[6,6.4],[7,6.5],[-7,6.4],[9,6.6],[0,6.4],[5,6.3],[-15,6.8],[7,6.9],[5,6.8],[4,6.7]])},
-    UBS01:{name:"瑞銀美國總收益股票 (月配)", years:mkYrs([[-30,6.8],[22,7.0],[11,7.0],[0,6.9],[12,7.0],[20,7.1],[8,7.0],[-2,6.9],[9,7.0],[14,7.1],[-6,7.0],[19,7.1],[8,7.1],[16,7.0],[-14,7.2],[14,7.3],[11,7.2],[5,7.1]])},
-    FUB01:{name:"富邦人壽全委月撥回帳戶 (穩健型)", years:mkYrs([[-16,5.8],[14,6.0],[6,6.0],[-2,5.9],[8,6.0],[7,6.0],[3,5.9],[-4,5.8],[5,6.0],[6,6.0],[-6,5.9],[8,6.1],[2,6.0],[5,5.9],[-13,6.2],[6,6.3],[5,6.2],[3,6.1]])}
-  }
-};
-
 const YEAR_EVENTS = {
   2008:'金融海嘯重擊', 2009:'QE 強勁反彈', 2011:'歐債危機震盪', 2015:'中國股災與升息',
   2018:'中美貿易戰回檔', 2019:'降息多頭延續', 2020:'新冠疫情衝擊', 2021:'全球資金行情',
-  2022:'聯準會暴力升息', 2023:'AI 帶動修復', 2024:'降息循環多頭', 2025:'高檔震盪整理'
+  2022:'聯準會暴力升息', 2023:'AI 帶動修復', 2024:'降息循環多頭', 2025:'高檔震盪整理', 2026:'最新市場走勢'
+};
+
+// 離線備援（僅在尚未產生 funds_data.json 時使用）
+const DEFAULT_FUND_DB = {
+  updated_at: "等待首次同步",
+  funds: {
+    JFP11:{name:"摩根多重收益 (美元對沖/穩定月配)", months:[{ym:"2019-01",nav:100,div:0.56},{ym:"2020-01",nav:106,div:0.57},{ym:"2021-01",nav:103,div:0.55},{ym:"2022-01",nav:108,div:0.57},{ym:"2023-01",nav:90,div:0.52},{ym:"2024-01",nav:96,div:0.55},{ym:"2025-01",nav:101,div:0.58}]},
+    MLE24:{name:"貝萊德世界科技 (A10美元/穩定月配)", months:[{ym:"2022-01",nav:100,div:0.7},{ym:"2023-01",nav:65,div:0.45},{ym:"2024-01",nav:88,div:0.62},{ym:"2025-01",nav:105,div:0.74}]},
+    NGB1: {name:"高盛環球非投資等級債 (X股美元/月配)", months:[{ym:"2019-01",nav:75,div:0.47},{ym:"2020-01",nav:76,div:0.47},{ym:"2021-01",nav:74,div:0.46},{ym:"2022-01",nav:70,div:0.44},{ym:"2023-01",nav:55,div:0.36},{ym:"2024-01",nav:48,div:0.32},{ym:"2025-01",nav:41,div:0.28},{ym:"2026-11",nav:35.06,div:0.24}]},
+    NGB2: {name:"高盛新興市場債 (X股美元/月配)", months:[{ym:"2019-01",nav:72,div:0.46},{ym:"2020-01",nav:74,div:0.47},{ym:"2021-01",nav:70,div:0.44},{ym:"2022-01",nav:65,div:0.42},{ym:"2023-01",nav:50,div:0.34},{ym:"2024-01",nav:52,div:0.35},{ym:"2025-01",nav:53,div:0.35}]}
+  }
 };
 
 let fundDB = DEFAULT_FUND_DB;
@@ -881,7 +867,10 @@ function renderFundOptions(){
     code.toLowerCase().includes(q) || obj.name.toLowerCase().includes(q)
   );
   sel.innerHTML = filtered.length
-    ? filtered.map(([code, obj]) => `<option value="${code}">${code} — ${obj.name}</option>`).join('')
+    ? filtered.map(([code, obj]) => {
+        const lastNav = obj.months && obj.months.length ? ` (最新淨值 ${obj.months[obj.months.length-1].nav})` : '';
+        return `<option value="${code}">${code} — ${obj.name}${lastNav}</option>`;
+      }).join('')
     : '<option value="">查無符合標的</option>';
 }
 
@@ -894,9 +883,10 @@ function renderSelectedFunds(){
   }
   grid.innerHTML = selectedFunds.map((item, idx) => {
     const fObj = fundDB.funds[item.code] || DEFAULT_FUND_DB.funds[item.code] || { name: item.code };
+    const lastNav = fObj.months && fObj.months.length ? fObj.months[fObj.months.length-1].nav : '—';
     return `<div class="bt-fund-card">
       <button type="button" class="bt-fc-del" onclick="removeFund(${idx})" title="移除">×</button>
-      <div class="bt-fc-code">${item.code}</div>
+      <div class="bt-fc-code">${item.code} <span style="font-size:.65rem;color:var(--txt3);font-weight:600">淨值 ${lastNav}</span></div>
       <div class="bt-fc-name" title="${fObj.name}">${fObj.name}</div>
       <div class="bt-fc-row">
         <div class="iw" style="flex:1">
@@ -913,7 +903,6 @@ function updateWeightSum(){
   const sum = selectedFunds.reduce((a,b)=>a + (Number(b.weight)||0), 0);
   set('bt-w-sum', `總配置比例：${sum}%` + (sum !== 100 && sum > 0 ? '（計算時將自動按比例歸一化）' : ''), sum === 100 ? 'var(--green)' : 'var(--orange)');
 }
-
 function addSelectedFund(){
   const code = el('bt-select').value;
   if(!code) return;
@@ -921,21 +910,11 @@ function addSelectedFund(){
   selectedFunds.push({ code, weight: 20 });
   renderSelectedFunds(); runBacktest(); drawBTFrame(btProgress);
 }
-
-function removeFund(idx){
-  selectedFunds.splice(idx, 1);
-  renderSelectedFunds(); runBacktest(); drawBTFrame(btProgress);
-}
-
-function updateFundWeight(idx, val){
-  selectedFunds[idx].weight = Math.max(0, Number(val) || 0);
-  updateWeightSum(); runBacktest(); drawBTFrame(btProgress);
-}
-
+function removeFund(idx){ selectedFunds.splice(idx, 1); renderSelectedFunds(); runBacktest(); drawBTFrame(btProgress); }
+function updateFundWeight(idx, val){ selectedFunds[idx].weight = Math.max(0, Number(val) || 0); updateWeightSum(); runBacktest(); drawBTFrame(btProgress); }
 function equalizeWeights(){
   if(!selectedFunds.length) return;
-  const base = Math.floor(100 / selectedFunds.length);
-  let rem = 100 - base * selectedFunds.length;
+  const base = Math.floor(100 / selectedFunds.length); let rem = 100 - base * selectedFunds.length;
   selectedFunds.forEach((f, i) => { f.weight = base + (i < rem ? 1 : 0); });
   renderSelectedFunds(); runBacktest(); drawBTFrame(btProgress);
 }
@@ -944,16 +923,19 @@ fetch('./funds_data.json?t=' + Date.now())
   .then(r => { if(!r.ok) throw new Error('no json'); return r.json(); })
   .then(data => {
     if(data && data.funds && Object.keys(data.funds).length > 0){
-      fundDB = data;
-      set('bt-src-badge', `✓ 自動同步 ${Object.keys(data.funds).length} 檔（${data.updated_at}）`);
-    } else {
-      set('bt-src-badge', `內建 ${Object.keys(DEFAULT_FUND_DB.funds).length} 檔熱門標的`);
+      const firstKey = Object.keys(data.funds)[0];
+      if(data.funds[firstKey].months){
+        fundDB = data;
+        set('bt-src-badge', `✓ 原始淨值同步 ${Object.keys(data.funds).length} 檔（${data.updated_at}）`);
+      } else {
+        set('bt-src-badge', '請先執行 Actions 更新淨值檔');
+      }
     }
     renderFundOptions(); renderSelectedFunds();
     if(el('page4').classList.contains('active')){ runBacktest(); drawBTFrame(btProgress); }
   })
   .catch(() => {
-    set('bt-src-badge', `內建 ${Object.keys(DEFAULT_FUND_DB.funds).length} 檔熱門標的`);
+    set('bt-src-badge', '離線基準模式');
     renderFundOptions(); renderSelectedFunds();
   });
 
@@ -964,66 +946,106 @@ function selectStartYr(yr){
   runBacktest(); replayAnim();
 }
 
-function getPortfolioYearStats(calYr){
-  let wSum = 0, navSum = 0, divSum = 0;
-  selectedFunds.forEach(item => {
-    const w = Math.max(0, Number(item.weight) || 0);
-    if(w <= 0) return;
-    const fObj = (fundDB.funds && fundDB.funds[item.code]) || DEFAULT_FUND_DB.funds[item.code];
-    if(!fObj || !fObj.years || !fObj.years.length) return;
-    const yrs = fObj.years;
-    let pt = yrs.find(x => x.yr === calYr);
-    if(!pt){ pt = yrs[Math.abs(calYr - yrs[0].yr) % yrs.length]; }
-    wSum += w; navSum += w * pt.navChg; divSum += w * pt.divYield;
-  });
-  if(wSum <= 0) return { navChg: 0, divYield: lastParams.DR || 8 };
-  return { navChg: navSum / wSum, divYield: divSum / wSum };
+// 取得單檔基金從 startYr 開始連續 240 個月的平滑原始淨值與配息序列
+function buildFund240Months(code, startYr){
+  const fObj = (fundDB.funds && fundDB.funds[code]) || DEFAULT_FUND_DB.funds[code];
+  const raw = (fObj && fObj.months && fObj.months.length) ? fObj.months : [{ym:'2020-01', nav:10, div:0.06}];
+  // 找到 >= startYr-01 的起始點，若該基金較晚成立則從其第一筆資料起算
+  let startIdx = raw.findIndex(m => parseInt(m.ym.slice(0,4)) >= startYr);
+  if(startIdx < 0) startIdx = 0;
+
+  const seq = [];
+  let scale = 1.0;
+  let curIdx = startIdx;
+  let prevNav = raw[startIdx].nav;
+
+  for(let i=0; i<=240; i++){
+    const pt = raw[curIdx];
+    const nav = pt.nav * scale;
+    const div = pt.div * scale;
+    seq.push({ nav, div, ym: pt.ym });
+    prevNav = nav;
+
+    curIdx++;
+    if(curIdx >= raw.length){
+      // 超過最新歷史資料後，從頭銜接並自動縮放比例，確保淨值曲線平滑不跳空
+      curIdx = 0;
+      scale = prevNav / (raw[0].nav || 1);
+    }
+  }
+  return seq;
 }
 
 function runBacktest(){
   const p = lastParams;
-  let invBal = p.totalInvested, loanBal = p.LA, resBal = p.reserveAmt, cumDiv = 0;
+  const activeFunds = selectedFunds.filter(f => (Number(f.weight) || 0) > 0);
+  const wSum = activeFunds.reduce((a,b)=>a + Number(b.weight), 0);
+  if(!activeFunds.length || wSum <= 0){ btData = []; return; }
+
   const isFin = (p.loanMode === 'financial'), riRate = p.RI / 100;
+  let loanBal = p.LA, resBal = p.reserveAmt, cumDiv = 0;
   let resDepletedYr = null, marginCallYr = null, minMargin = Infinity;
 
+  // 初始化各檔標的的 240 個月原始淨值序列與期初單位數
+  const holdings = activeFunds.map(f => {
+    const ratio = Number(f.weight) / wSum;
+    const seq = buildFund240Months(f.code, btStartYr);
+    const initAmt = p.totalInvested * ratio;
+    const initUnits = seq[0].nav > 0 ? initAmt / seq[0].nav : 0;
+    return { code: f.code, ratio, seq, units: initUnits };
+  });
+
+  const calcTotalMkt = mIdx => holdings.reduce((sum, h) => sum + h.units * h.seq[mIdx].nav, 0);
+
   btData = [{
-    yr: 0, calYr: btStartYr, event: '期初進場配置',
-    navChg: 0, divYield: 0, invBal, cumDiv: 0, totalVal: invBal,
+    yr: 0, calYr: btStartYr, event: '期初依原始淨值進場',
+    invBal: p.totalInvested, cumDiv: 0, totalVal: p.totalInvested,
     loanBal, resBal, avgFree: 0,
-    marginRatio: calcMarginRatio(invBal, p.leverageAmt)
+    marginRatio: calcMarginRatio(p.totalInvested, p.leverageAmt)
   }];
 
   for(let yr=1; yr<=20; yr++){
     const calYr = btStartYr + yr - 1;
-    const { navChg, divYield } = getPortfolioYearStats(calYr);
-    const monthlyNavFactor = Math.pow(1 + navChg/100, 1/12);
-    const ms = (yr-1)*12 + 1, me = yr*12;
     let annFree = 0;
-
-    for(let m=ms; m<=me; m++){
-      invBal *= monthlyNavFactor;
+    for(let k=1; k<=12; k++){
+      const m = (yr-1)*12 + k; // 1..240
       let curPay = 0;
       if(m <= p.n){
         const interest = loanBal * p.mr, isGrace = m <= p.grN;
         if(!isFin && !isGrace && p.repN > 0) loanBal = Math.max(0, loanBal - (p.fullPay - interest));
         curPay = isGrace ? p.grPay : p.fullPay;
       }
-      const md = invBal * (divYield / 100) / 12 - p.monthlyLevCost;
+
+      // 依各檔「持有單位數 × 當月真實每單位配息」計算總配息
+      let grossDiv = 0;
+      holdings.forEach(h => { grossDiv += h.units * h.seq[m].div; });
+      const md = grossDiv - p.monthlyLevCost;
       const ri = Math.max(0, md) * riRate;
       const cashDiv = Math.max(0, md - ri);
       cumDiv += cashDiv;
+
+      // 再投入金額依當月原始淨值買進更多單位數
+      if(ri > 0){
+        holdings.forEach(h => {
+          const buyAmt = ri * h.ratio;
+          if(h.seq[m].nav > 0) h.units += buyAmt / h.seq[m].nav;
+        });
+      }
+
       const free = md - ri - curPay;
-      annFree += free; invBal += ri;
+      annFree += free;
       if(free < 0) resBal = Math.max(0, resBal + free);
     }
+
+    const invBal = calcTotalMkt(yr * 12);
     if(resBal <= 0 && resDepletedYr === null && p.reserveAmt > 0) resDepletedYr = yr;
     const mRatio = calcMarginRatio(invBal, p.leverageAmt);
     if(mRatio < minMargin) minMargin = mRatio;
     if(p.leverageAmt > 0 && mRatio < 130 && marginCallYr === null) marginCallYr = yr;
 
     btData.push({
-      yr, calYr, event: YEAR_EVENTS[calYr] || '歷史循環推演',
-      navChg, divYield, invBal, cumDiv, totalVal: invBal + cumDiv,
+      yr, calYr, event: YEAR_EVENTS[calYr] || '歷史淨值循環推演',
+      invBal, cumDiv, totalVal: invBal + cumDiv,
       loanBal, resBal, avgFree: annFree / 12, marginRatio: mRatio
     });
   }
@@ -1032,14 +1054,14 @@ function runBacktest(){
   if(marginCallYr !== null){
     vd.className = 'verd vv-lose'; set('bt-vi', '⚠');
     set('bt-vh', `壓力測試未通過：第 ${marginCallYr} 年觸及槓桿追繳線！`);
-    set('bt-vp', `以 ${btStartYr} 年起點回測目前標的組合，最低維持率降至 ${fmtP(minMargin,1)}（低於 130%）。建議降低槓桿或調整標的權重。`);
+    set('bt-vp', `以 ${btStartYr} 年原始淨值起點回測，最低維持率降至 ${fmtP(minMargin,1)}（低於 130%）。建議降低槓桿或調整標的權重。`);
   } else if(resDepletedYr !== null){
     vd.className = 'verd vv-even'; set('bt-vi', '⚡');
     set('bt-vh', `備用金於第 ${resDepletedYr} 年耗盡，需額外現金流支撐`);
     set('bt-vp', `第 20 年本金市值 ${fmtW(last.invBal)} ＋ 累積配息 ${fmtW(last.cumDiv)} ＝ 含息總值 ${fmtW(last.totalVal)}，期末貸款餘額 ${fmtW(last.loanBal)}。`);
   } else {
     vd.className = 'verd vv-win'; set('bt-vi', '✓');
-    set('bt-vh', `穩定通過 ${btStartYr} 起點 20 年歷史壓力測試！`);
+    set('bt-vh', `穩定通過 ${btStartYr} 起點 20 年原始淨值壓力測試！`);
     set('bt-vp', `第 20 年本金市值 ${fmtW(last.invBal)} ＋ 累積配息 ${fmtW(last.cumDiv)} ＝ 含息總值 ${fmtW(last.totalVal)}，期末貸款餘額 ${fmtW(last.loanBal)}，備用金剩 ${fmtW(last.resBal)}。`);
   }
 }
@@ -1085,16 +1107,17 @@ function drawBTFrame(prog){
   const dispPt = btData[Math.round(prog)];
   const baseInv = btData[0].invBal || 1;
   const totalRoi = ((curTotal - baseInv) / baseInv) * 100;
+  const navRoi = ((curInv - baseInv) / baseInv) * 100;
 
   el('bt-scrub').value = prog;
   set('bt-scrub-lbl', `第 ${Math.round(prog)} 年`);
   set('bt-cur-yr', dispPt.yr === 0 ? `第 0 年（${dispPt.calYr} 期初）` : `第 ${dispPt.yr} 年（${dispPt.calYr}）`);
-  set('bt-cur-event', dispPt.event + (dispPt.yr>0 ? `（組合淨值 ${dispPt.navChg>=0?'+':''}${dispPt.navChg.toFixed(1)}% / 配息率 ${dispPt.divYield.toFixed(1)}%）` : ''));
+  set('bt-cur-event', dispPt.event);
 
   set('bt-v-mkt', fmtW(curInv));
-  set('bt-s-nav', dispPt.yr===0 ? '期初投入' : `當年波動 ${dispPt.navChg>=0?'+':''}${dispPt.navChg.toFixed(1)}%`);
+  set('bt-s-nav', `本金報酬 ${navRoi>=0?'+':''}${navRoi.toFixed(1)}%`);
   set('bt-v-div', fmtW(curDiv));
-  set('bt-s-div', dispPt.yr===0 ? '累計領回配息' : `當年度配息率 ${dispPt.divYield.toFixed(1)}%`);
+  set('bt-s-div', '累計領回配息');
   set('bt-v-total', fmtW(curTotal));
   set('bt-s-roi', `含息累積報酬 ${totalRoi>=0?'+':''}${totalRoi.toFixed(1)}%`);
   set('bt-v-loan', curLoan < 1 ? '已還清' : fmtW(curLoan), curLoan < 1 ? 'var(--green)' : 'var(--red)');
@@ -1105,7 +1128,6 @@ function drawBTFrame(prog){
   const badge = el('bt-status-badge');
   if(lastParams.leverageAmt>0 && dispPt.marginRatio<130){ badge.className='bt-event-badge bt-b-bad'; badge.textContent='⚠ 觸及追繳警示'; }
   else if(curRes <= 0 && lastParams.reserveAmt > 0){ badge.className='bt-event-badge bt-b-warn'; badge.textContent='⚡ 備用金已耗盡'; }
-  else if(dispPt.navChg <= -15){ badge.className='bt-event-badge bt-b-warn'; badge.textContent='⚡ 市場劇烈回檔中'; }
   else { badge.className='bt-event-badge bt-b-ok'; badge.textContent='✓ 現金流穩定運行'; }
 
   const canvas = el('bt-canvas'), rect = canvas.parentElement.getBoundingClientRect();
@@ -1155,13 +1177,9 @@ function drawBTFrame(prog){
     ctx.restore();
   }
 
-  // 1. 本金＋含息（藍實線 + 淺藍底）
   drawSeries(d=>d.totalVal, '#1d5fd4', false, 'rgba(29,95,212,0.08)');
-  // 2. 本金（綠實線）
   drawSeries(d=>d.invBal, '#008a5e', false, null);
-  // 3. 利息（金實線）
   drawSeries(d=>d.cumDiv, '#c08a00', false, null);
-  // 4. 貸款餘額（紅虛線）
   drawSeries(d=>d.loanBal, '#d42b2b', true, null);
 }
 
