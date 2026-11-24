@@ -79,10 +79,11 @@ def fetch_nav_history(dj_id):
                 records = []
                 for d_str, n_str in zip(dates, navs):
                     try:
-                        d_norm = d_str.replace("/", "-")
-                        ym = d_norm[:7]
+                        # 統一將 YYYYMMDD / YYYY/MM/DD / YYYY-MM-DD 轉為標準 YYYY-MM
+                        digits = re.sub(r"\D", "", d_str)
                         val = float(n_str)
-                        if len(ym) == 7 and val > 0:
+                        if len(digits) >= 6 and val > 0:
+                            ym = f"{digits[:4]}-{digits[4:6]}"
                             records.append((ym, val))
                     except Exception:
                         continue
