@@ -79,7 +79,6 @@ def fetch_nav_history(dj_id):
                 records = []
                 for d_str, n_str in zip(dates, navs):
                     try:
-                        # 統一將 YYYYMMDD / YYYY/MM/DD / YYYY-MM-DD 轉為標準 YYYY-MM
                         digits = re.sub(r"\D", "", d_str)
                         val = float(n_str)
                         if len(digits) >= 6 and val > 0:
@@ -126,7 +125,6 @@ def build_monthly_series(dj_id, base_yield):
     div_by_ym = fetch_div_history(dj_id)
     has_real_div = len(div_by_ym) > 0
 
-    # 每月取最後一筆原始淨值
     nav_by_ym = {}
     for ym, val in nav_records:
         nav_by_ym[ym] = val
@@ -143,8 +141,9 @@ def build_monthly_series(dj_id, base_yield):
     return months if len(months) >= 6 else None
 
 def main():
-    old_data = load_existing()
-    new_funds = old_data.get("funds", {})
+    old_funds = load_existing().get("funds", {})
+    # 只保留 FUND_MAP 內的 15 檔，徹底清除舊版殘留的 NaN 標的
+    new_funds = {}
     updated_any = False
 
     for code, cfg in FUND_MAP.items():
@@ -153,8 +152,11 @@ def main():
             new_funds[code] = {"name": cfg["name"], "months": months}
             updated_any = True
             print(f"[{code} / {cfg['dj_id']}] 成功 | 最新淨值: {months[-1]['nav']} ({months[-1]['ym']}) | 共 {len(months)} 個月")
-        else:
+        elif code in old_funds and "months" in old_funds[code]:
+            new_funds[code] = old_funds[code]
             print(f"[{code} / {cfg['dj_id']}] 抓取失敗，保留舊資料")
+        else:
+            print(f"[{code} / {cfg['dj_id']}] 抓取失敗")
         time.sleep(0.5)
 
     if updated_any:
@@ -163,8 +165,8 @@ def main():
             "funds": new_funds
         }
         with open(DATA_FILE, "w", encoding="utf-8") as f:
-            json.dump(output, f, ensure_ascii=False, indent=2)
-        print("funds_data.json 已更新完成。")
+            json.dump(output, f, ensure_ascii=False, indent=2, allow_nan=False)
+        print("funds_data.json 已更新完成（已清除舊版殘留資料）。")
     else:
         print("本次無任何更新，維持原檔案。")
 
